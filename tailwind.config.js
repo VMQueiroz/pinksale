@@ -14,10 +14,11 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: '#FF4081', // Agora você pode usar bg-primary, text-primary, etc.
+                //primary: '#FF4081', // Agora você pode usar bg-primary, text-primary, etc.
+                primary: '#ff006a', // Agora você pode usar bg-primary, text-primary, etc.
                 transparent: 'transparent',
                 current: 'currentColor',
-                "pk": "#FF4081",
+                "pk": "#ff006a",
                 "pklt": "#FE5C93",
                 "pkdk": "#F51664",
             },

@@ -54,7 +54,7 @@
         <!-- Logo Area -->
         <div class="flex items-center justify-center h-16 flex-shrink-0 px-4 border-b border-gray-200" :class="isCollapsed ? 'justify-center' : 'justify-start'">
             {{-- Logos change based on isCollapsed state. Ensure files exist in public/img/ --}}
-            <img :src="isCollapsed ? '/img/logo-pinksale-icon.png' : '/img/logo-pinksale-full.png'"
+            <img :src="isCollapsed ? '/img/logo-pinksale-icon_2.png' : '/img/logo-pinksale-full_2.png'"
                  alt="Logo PinkSale"
                  :class="isCollapsed ? 'h-12' : 'h-14'" {{-- Dynamic height based on isCollapsed --}}
                  class="transition-all duration-300">
@@ -102,13 +102,13 @@
                          'origin-top-right bg-white rounded-md shadow-lg'
                      ]">
                     <div class="py-1">
-                        <a href="#" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white">Abordagens</a>
-                        <a href="{{ route('clientes.index') }}" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white">Clientes</a>
-                        <a href="{{ route('parceiros.index') }}" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white">Parceiros</a>
-                        <a href="#" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white">Sessões</a>
-                        <a href="#" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white">Urnas</a>
-                        <a href="{{ route('consultores.index') }}" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white">Consultores</a>
-                        <a href="#" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white">Aniversariantes</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white {{ request()->routeIs('abordagens.*') ? 'bg-pk text-white' : 'text-pk' }}">Abordagens</a>
+                        <a href="{{ route('clientes.index') }}" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white {{ request()->routeIs('clientes.*') ? 'bg-pk text-white' : 'text-pk' }}">Clientes</a>
+                        <a href="{{ route('parceiros.index') }}" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white {{ request()->routeIs('parceiros.*') ? 'bg-pk text-white' : 'text-pk' }}">Parceiros</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white {{ request()->routeIs('sessoes.*') ? 'bg-pk text-white' : 'text-pk' }}">Sessões</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white {{ request()->routeIs('urnas.*') ? 'bg-pk text-white' : 'text-pk' }}">Urnas</a>
+                        <a href="{{ route('consultores.index') }}" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white {{ request()->routeIs('consultores.*') ? 'bg-pk text-white' : 'text-pk' }}">Consultores</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white {{ request()->routeIs('aniversariantes.*') ? 'bg-pk text-white' : 'text-pk' }}">Aniversariantes</a>
                     </div>
                 </div>
             </div>
