@@ -21,7 +21,6 @@
                     id="email" 
                     type="email" 
                     class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm" 
-                    required 
                 />
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
@@ -49,7 +48,6 @@
                     id="cep" 
                     type="text" 
                     class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm" 
-                    required 
                 />
                 <x-input-error :messages="$errors->get('cep')" class="mt-2" />
             </div>
@@ -61,7 +59,6 @@
                     id="endereco" 
                     type="text" 
                     class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm" 
-                    required 
                 />
                 <x-input-error :messages="$errors->get('endereco')" class="mt-2" />
             </div>
@@ -73,7 +70,6 @@
                     id="numero" 
                     type="text" 
                     class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm" 
-                    required 
                 />
                 <x-input-error :messages="$errors->get('numero')" class="mt-2" />
             </div>
@@ -109,7 +105,6 @@
                     id="cidade" 
                     type="text" 
                     class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm" 
-                    required 
                 />
                 <x-input-error :messages="$errors->get('cidade')" class="mt-2" />
             </div>

@@ -1,21 +1,22 @@
-<div>
-    {{-- Cabeçalho --}}
-    <div class="sm:flex sm:items-center">
-        <div class="sm:flex-auto">
-            <div class="max-w-xl">
-                <x-text-input 
-                    wire:model.live.debounce.300ms="search"
-                    type="search"
-                    placeholder="Buscar consultores..."
-                    class="w-full"
-                />
+<div class="p-6">
+    <x-notification />
+    {{-- Cabeçalho com Estatísticas --}}
+    <div class="flex justify-between items-center mb-6">
+        <div class="flex-1">
+            <x-slot name="header">
+                <h2 class="font-semibold text-xl text-white leading-tight">
+                    Consultores
+                </h2>
+            </x-slot>
+            <div class="mt-1 flex space-x-4 text-sm text-gray-600">
+                <span>Total: {{ $totalConsultores }}</span>
             </div>
         </div>
-        <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+        <div>
             <x-primary-button
                 type="button"
                 x-data=""
-                x-on:click.prevent="$dispatch('open-modal', 'novo-consultor')"
+                x-on:click.prevent="$dispatch('open-modal', 'novo-consultor');"
             >
                 Novo Consultor
             </x-primary-button>
@@ -23,25 +24,24 @@
     </div>
 
     {{-- Filtros e Controles --}}
-    <div class="mt-4 flex space-x-4">
+    <div class="mb-4 flex space-x-4">
+        <div class="flex-1">
+            <x-input
+                wire:model.live.debounce.300ms="search"
+                type="search"
+                placeholder="Buscar consultores..."
+                class="block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm"
+            />
+        </div>
         <div>
-            <x-select wire:model.live="filtroStatus" class="block w-full">
-                <option value="todos">Todos os Status</option>
-                @foreach($status_list as $valor => $label)
-                    <option value="{{ $valor }}">{{ $label }}</option>
-                @endforeach
+            <x-select wire:model.live="filtroStatus" class="block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm">
+                <option value="todos">Todos</option>
+                <option value="ativos">Ativos</option>
+                <option value="inativos">Inativos</option>
             </x-select>
         </div>
         <div>
-            <x-select wire:model.live="filtroNivel" class="block w-full">
-                <option value="todos">Todos os Níveis</option>
-                @foreach($niveis as $valor => $label)
-                    <option value="{{ $valor }}">{{ $label }}</option>
-                @endforeach
-            </x-select>
-        </div>
-        <div>
-            <x-select wire:model.live="perPage" class="block w-full">
+            <x-select wire:model.live="perPage" class="block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm">
                 <option value="10">10 por página</option>
                 <option value="25">25 por página</option>
                 <option value="50">50 por página</option>
@@ -50,51 +50,56 @@
     </div>
 
     {{-- Tabela --}}
-    <div class="mt-8 flow-root">
-        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                <table class="min-w-full divide-y divide-gray-300">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">Nome</th>
-                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Nível</th>
-                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Contato</th>
-                            <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                                <span class="sr-only">Ações</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white">
-                        @foreach($consultores as $consultor)
-                            <tr>
-                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
-                                    {{ $consultor->nome }}
-                                </td>
-                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {{ $niveis[$consultor->nivel] }}
-                                </td>
-                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {{ $status_list[$consultor->status] }}
-                                </td>
-                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {{ $consultor->email }}<br>
-                                    {{ $consultor->telefone }}
-                                </td>
-                                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
-                                    <x-secondary-button wire:click="edit({{ $consultor->id }})">
-                                        Editar
-                                    </x-secondary-button>
-                                    <x-danger-button wire:click="confirmDelete({{ $consultor->id }})">
-                                        Excluir
-                                    </x-danger-button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <div class="overflow-x-auto bg-white rounded-lg shadow">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th wire:click="sortBy('nome')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                        Nome
+                        @if ($sortField === 'nome')
+                            @if ($sortDirection === 'asc')
+                                ↑
+                            @else
+                                ↓
+                            @endif
+                        @endif
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @forelse($consultores as $consultor)
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $consultor->nome }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $consultor->email }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $consultor->telefone }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <x-secondary-button
+                                wire:click="edit({{ $consultor->id }})"
+                                x-data=""
+                                x-on:click="$dispatch('open-modal', 'editar-consultor')"
+                            >
+                                Editar
+                            </x-secondary-button>
+                            <x-danger-button
+                                wire:click="delete({{ $consultor->id }})"
+                                wire:confirm="Tem certeza que deseja excluir este consultor?"
+                            >
+                                Excluir
+                            </x-danger-button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                            Nenhum consultor encontrado
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
 
     {{-- Paginação --}}
@@ -103,32 +108,26 @@
     </div>
 
     {{-- Modais --}}
-    <x-modal name="novo-consultor" focusable>
-        <livewire:consultores.consultor-form />
-    </x-modal>
-
-    <x-modal name="editar-consultor" focusable>
-        @if($consultorEmEdicao)
-            <livewire:consultores.consultor-form :contato="$consultorEmEdicao" />
-        @endif
-    </x-modal>
-
-    <x-modal name="confirmar-exclusao" focusable>
+    <x-modal name="novo-consultor" :show="false">
         <div class="p-6">
-            <h2 class="text-lg font-medium text-gray-900">
-                Confirmar Exclusão
+            <h2 class="text-lg font-medium text-gray-900 mb-4">
+                Novo Consultor
             </h2>
-            <p class="mt-1 text-sm text-gray-600">
-                Tem certeza que deseja excluir este consultor?
-            </p>
-            <div class="mt-6 flex justify-end">
-                <x-secondary-button x-on:click="$dispatch('close')">
-                    Cancelar
-                </x-secondary-button>
-                <x-danger-button class="ml-3" wire:click="deleteConsultor">
-                    Excluir
-                </x-danger-button>
-            </div>
+            <livewire:consultores.consultor-form />
+        </div>
+    </x-modal>
+
+    <x-modal name="editar-consultor" :show="false">
+        <div class="p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">
+                Editar Consultor
+            </h2>
+            @if($consultorEmEdicao)
+                <livewire:consultores.consultor-form
+                    :contato="$consultorEmEdicao"
+                    :key="'edit-'.$consultorEmEdicao->id"
+                />
+            @endif
         </div>
     </x-modal>
 </div>

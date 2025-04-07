@@ -14,10 +14,7 @@ class ConsultorIndex extends Component
     public $perPage = 10;
     public $sortField = 'nome';
     public $sortDirection = 'asc';
-    public $filtroStatus = 'todos';
-    public $filtroNivel = 'todos';
     public $consultorEmEdicao;
-    public $consultorToDelete; // Adicionando a propriedade
     
     protected $listeners = [
         'consultor-saved' => 'handleConsultorSaved'
@@ -42,27 +39,38 @@ class ConsultorIndex extends Component
         $this->dispatch('open-modal', 'novo-consultor');
     }
 
-    public function confirmDelete($id)
+    public function updatingSearch()
     {
-        $this->consultorToDelete = $id;
-        $this->dispatch('open-modal', 'confirmar-exclusao');
+        $this->resetPage();
     }
 
-    public function deleteConsultor()
+    public function sortBy($field)
     {
-        $consultor = Contato::find($this->consultorToDelete);
-        
-        if ($consultor->vendas()->exists()) {
-            $this->dispatch('notify', [
-                'type' => 'error',
-                'message' => 'Não é possível excluir um consultor com vendas vinculadas'
-            ]);
-            return;
-        }
+        $this->sortDirection = $this->sortField === $field 
+            ? $this->sortDirection === 'asc' ? 'desc' : 'asc'
+            : 'asc';
 
-        $consultor->delete();
-        $this->dispatch('notify', ['message' => 'Consultor excluído com sucesso']);
-        $this->dispatch('close-modal', 'confirmar-exclusao');
+        $this->sortField = $field;
+    }
+
+    public function delete($consultorId)
+    {
+        $consultor = Contato::find($consultorId);
+        if ($consultor) {
+            if ($consultor->vendasComoConsultor()->exists()) {
+                $this->dispatch('notify', [
+                    'type' => 'error',
+                    'message' => 'Não é possível excluir um consultor com vendas vinculadas'
+                ]);
+                return;
+            }
+
+            $consultor->delete();
+            $this->dispatch('notify', [
+                'type' => 'success',
+                'message' => 'Consultor excluído com sucesso!'
+            ]);
+        }
     }
 
     public function render()
@@ -75,12 +83,6 @@ class ConsultorIndex extends Component
                         ->orWhere('email', 'like', '%' . $this->search . '%')
                         ->orWhere('telefone', 'like', '%' . $this->search . '%');
                 });
-            })
-            ->when($this->filtroStatus !== 'todos', function ($query) {
-                $query->where('status', $this->filtroStatus);
-            })
-            ->when($this->filtroNivel !== 'todos', function ($query) {
-                $query->where('nivel', $this->filtroNivel);
             });
 
         $consultores = $query
@@ -90,15 +92,7 @@ class ConsultorIndex extends Component
         return view('livewire.consultores.consultor-index', [
             'consultores' => $consultores,
             'totalConsultores' => Contato::whereJsonContains('papeis', 'consultor')->count(),
-            'niveis' => [
-                'junior' => 'Júnior',
-                'pleno' => 'Pleno',
-                'senior' => 'Sênior',
-                'master' => 'Master',
-            ],
         ]);
     }
 }
-
-
 

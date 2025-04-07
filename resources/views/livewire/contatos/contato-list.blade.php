@@ -2,7 +2,7 @@
     <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
             <div class="max-w-xl">
-                <x-text-input 
+                <x-input 
                     wire:model.live.debounce.300ms="search"
                     type="search"
                     placeholder="Buscar contatos..."
@@ -23,4 +23,4 @@
 
     <div class="mt-4">
         <div class="flex space-x-2 overflow-x-auto">
-           
+            ...

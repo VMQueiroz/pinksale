@@ -41,30 +41,28 @@ class ClienteForm extends Component
         $this->contato = null;
     }
 
-    public function updatedMesAniversario($value)
-    {
-        if ($value !== null && $value !== '') {
-            $this->mes_aniversario = (int) $value;
-        }
-    }
+    
 
     protected function rules()
     {
         return [
             'nome' => 'required|min:3',
             'email' => [
-                'required',
+                'nullable',
                 'email',
                 Rule::unique('contatos', 'email')->ignore($this->contato?->id)
             ],
-            'telefone' => 'required',
-            'cep' => 'required',
-            'endereco' => 'required',
-            'numero' => 'required',
-            'estado' => 'required|size:2',
-            'cidade' => 'required',
-            'dia_aniversario' => ['nullable', 'integer', 'min:1', 'max:31', 'digits_between:1,2'],
-            'mes_aniversario' => ['nullable', 'integer', 'min:1', 'max:12'],
+            'telefone' => [
+                'required',
+                Rule::unique('contatos', 'telefone')->ignore($this->contato?->id)
+            ],
+            'cep' => 'nullable',
+            'endereco' => 'nullable',
+            'numero' => 'nullable',
+            'estado' => 'nullable|size:2',
+            'cidade' => 'nullable',
+            'dia_aniversario' => ['nullable', 'min:1', 'max:31', 'digits_between:1,2'],
+            'mes_aniversario' => ['nullable', 'min:1', 'max:12', 'digits_between:1,2'],
             'tipo_de_pele' => 'nullable|in:normal,seca,oleosa,mista,sensivel',
             'tom_de_pele' => 'nullable',
         ];

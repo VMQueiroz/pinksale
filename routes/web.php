@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\Produtos\ProdutoIndex;
 use App\Livewire\Dashboard\DashboardIndex;
 use App\Livewire\Clientes\ClienteIndex;
+use App\Livewire\Consultores\ConsultorIndex;
 use App\Livewire\Vendas\VendasIndex;
 
 // Rota pública
@@ -19,6 +20,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     // Clientes
     Route::prefix('clientes')->name('clientes.')->group(function () {
         Route::get('/', ClienteIndex::class)->name('index');
+    });
+
+    // Consultores
+    Route::prefix('consultores')->name('consultores.')->group(function () {
+        Route::get('/', ConsultorIndex::class)->name('index');
     });
 
     // Produtos e Estoque

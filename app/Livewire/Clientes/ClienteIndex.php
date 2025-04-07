@@ -5,7 +5,6 @@ namespace App\Livewire\Clientes;
 use App\Models\Contatos\Contato;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Http;
 
 class ClienteIndex extends Component
 {
@@ -76,28 +75,20 @@ class ClienteIndex extends Component
 
         $this->sortField = $field;
     }
-    
-    public function buscarCep()
-    {
-        if (strlen($this->cep) === 8) {
-            try {
-                $response = Http::get("https://viacep.com.br/ws/{$this->cep}/json/");
-                if ($response->successful()) {
-                    $dados = $response->json();
-                    $this->endereco = $dados['logradouro'];
-                    $this->cidade = $dados['localidade'];
-                    $this->estado = $dados['uf'];
-                }
-            } catch (\Exception $e) {
-                // Silently fail
-            }
-        }
-    }
 
     public function delete($clienteId)
     {
         $cliente = Contato::find($clienteId);
         if ($cliente) {
+
+            if ($cliente->vendasComoCliente()->exists()) {
+                $this->dispatch('notify', [
+                    'type' => 'error',
+                    'message' => 'Não é possível excluir um cliente com vendas vinculadas'
+                ]);
+                return;
+            }
+
             $cliente->delete();
             $this->dispatch('notify', [
                 'type' => 'success',

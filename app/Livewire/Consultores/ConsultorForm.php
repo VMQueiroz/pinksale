@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Consultores;
 
-use App\Models\Contatos\Contato;
 use Livewire\Component;
+use Illuminate\Validation\Rule;
+use App\Models\Contatos\Contato;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class ConsultorForm extends Component
 {
@@ -14,10 +16,7 @@ class ConsultorForm extends Component
     public $nome = '';
     public $email = '';
     public $telefone = '';
-    public $nivel = '';
-    public $status = 'ativo';
     public $data_inicio = '';
-    public $meta_mensal = 0;
     
     // Campos de endereço
     public $cep = '';
@@ -28,8 +27,6 @@ class ConsultorForm extends Component
     public $estado = '';
     
     // Campos adicionais
-    public $dia_aniversario = '';
-    public $mes_aniversario = '';
     public $observacoes = '';
 
     public function mount(?Contato $contato = null)
@@ -39,10 +36,7 @@ class ConsultorForm extends Component
             $this->nome = $contato->nome;
             $this->email = $contato->email;
             $this->telefone = $contato->telefone;
-            $this->nivel = $contato->nivel;
-            $this->status = $contato->status;
             $this->data_inicio = $contato->data_inicio?->format('Y-m-d');
-            $this->meta_mensal = $contato->meta_mensal;
             
             // Campos de endereço
             $this->cep = $contato->cep;
@@ -53,8 +47,6 @@ class ConsultorForm extends Component
             $this->estado = $contato->estado;
             
             // Campos adicionais
-            $this->dia_aniversario = $contato->dia_aniversario;
-            $this->mes_aniversario = $contato->mes_aniversario;
             $this->observacoes = $contato->observacoes;
         }
     }
@@ -63,74 +55,99 @@ class ConsultorForm extends Component
     {
         return [
             'nome' => 'required|min:3',
-            'email' => 'required|email',
-            'telefone' => 'required',
-            'nivel' => 'required|in:junior,pleno,senior,master',
-            'status' => 'required|in:ativo,inativo,suspenso,em_treinamento',
-            'data_inicio' => 'required|date',
-            'meta_mensal' => 'required|numeric|min:0',
-            'cep' => 'required',
-            'endereco' => 'required',
-            'numero' => 'required',
-            'cidade' => 'required',
-            'estado' => 'required',
-            'dia_aniversario' => 'nullable|numeric|min:1|max:31',
-            'mes_aniversario' => 'nullable|numeric|min:1|max:12',
+            'email' => [
+                'nullable',
+                'email',
+                Rule::unique('contatos', 'email')->ignore($this->contato?->id)
+            ],
+            'telefone' => [
+                'required',
+                Rule::unique('contatos', 'telefone')->ignore($this->contato?->id)
+            ],
+            'data_inicio' => 'nullable|date',
+            'cep' => 'nullable',
+            'endereco' => 'nullable',
+            'numero' => 'nullable',
+            'cidade' => 'nullable',
+            'estado' => 'nullable',
         ];
+    }
+
+    protected $listeners = ['close' => 'resetForm'];
+
+    public function resetForm()
+    {
+        $this->reset([
+            'nome', 'email', 'telefone',
+            'cep', 'endereco', 'numero', 'complemento', 'cidade', 'estado',
+            'observacoes'
+        ]);
+        $this->contato = null;
+    }
+
+    public function buscarCep()
+    {
+        $cep = preg_replace('/[^0-9]/', '', $this->cep);
+
+        if (strlen($cep) === 8) {
+            try {
+                $response = Http::get("https://viacep.com.br/ws/{$cep}/json/");
+                if ($response->successful()) {
+                    $dados = $response->json();
+                    if (!isset($dados['erro'])) {
+                        $this->endereco = $dados['logradouro'];
+                        $this->cidade = $dados['localidade'];
+                        $this->estado = $dados['uf'];
+                    }
+                }
+            } catch (\Exception $e) {
+                // Silently fail
+            }
+        }
     }
 
     public function save()
     {
         $this->validate();
 
-        $dados = [
-            'nome' => $this->nome,
-            'email' => $this->email,
-            'telefone' => $this->telefone,
-            'nivel' => $this->nivel,
-            'status' => $this->status,
-            'data_inicio' => $this->data_inicio,
-            'meta_mensal' => $this->meta_mensal,
-            'cep' => $this->cep,
-            'endereco' => $this->endereco,
-            'numero' => $this->numero,
-            'complemento' => $this->complemento,
-            'cidade' => $this->cidade,
-            'estado' => $this->estado,
-            'dia_aniversario' => $this->dia_aniversario,
-            'mes_aniversario' => $this->mes_aniversario,
-            'observacoes' => $this->observacoes,
-        ];
-        
-        if ($this->contato) {
-            $this->contato->update($dados);
-            $this->dispatch('notify', ['message' => 'Consultor atualizado com sucesso!']);
-        } else {
-            $dados['user_id'] = Auth::id();
-            $dados['papeis'] = ['consultor'];
-            Contato::create($dados);
-            $this->dispatch('notify', ['message' => 'Consultor criado com sucesso!']);
-        }
+        try {
+            $dados = [
+                'nome' => $this->nome,
+                'email' => $this->email,
+                'telefone' => $this->telefone,
+                'cep' => $this->cep,
+                'endereco' => $this->endereco,
+                'numero' => $this->numero,
+                'complemento' => $this->complemento,
+                'cidade' => $this->cidade,
+                'estado' => $this->estado,
+                'observacoes' => $this->observacoes
+            ];
 
-        $this->dispatch('consultor-saved');
+            if ($this->contato && $this->contato->exists) {
+                $this->contato->update($dados);
+                $message = 'Consultor atualizado com sucesso!';
+            } else {
+                $dados['user_id'] = Auth::id();
+                $dados['papeis'] = ['consultor'];
+                Contato::create($dados);
+                $message = 'Consultor criado com sucesso!';
+            }
+
+            $this->dispatch('notify', type: 'success', message: $message);
+            $this->dispatch('consultor-saved');
+            $this->dispatch('close');
+            $this->resetForm();
+            
+        } catch (\Exception $e) {
+            $this->dispatch('notify', type: 'error', message: 'Erro ao salvar consultor: ' . $e->getMessage());
+        }
     }
 
     public function render()
     {
-        return view('livewire.consultores.consultor-form', [
-            'niveis' => [
-                'junior' => 'Júnior',
-                'pleno' => 'Pleno',
-                'senior' => 'Sênior',
-                'master' => 'Master',
-            ],
-            'status_list' => [
-                'ativo' => 'Ativo',
-                'inativo' => 'Inativo',
-                'suspenso' => 'Suspenso',
-                'em_treinamento' => 'Em Treinamento',
-            ],
-        ]);
+        return view('livewire.consultores.consultor-form');
     }
 }
+
 

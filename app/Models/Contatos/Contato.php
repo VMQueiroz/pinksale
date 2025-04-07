@@ -49,7 +49,7 @@ class Contato extends Model
     }
 
     // Relacionamento com vendas onde este contato é o comprador
-    public function compras(): HasMany
+    public function vendasComoCliente(): HasMany
     {
         return $this->hasMany(Venda::class, 'comprador_id');
     }
