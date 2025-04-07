@@ -1,16 +1,37 @@
 <div>
-    <form wire:submit="save" class="space-y-6">
-        <div class="grid grid-cols-1 sm:grid-cols-6 gap-4">
-            <!-- Campos básicos -->
-            <div class="sm:col-span-4">
+    <form wire:submit="save">
+        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <div class="sm:col-span-3">
                 <x-input-label for="nome" value="Nome" />
-                <x-input wire:model="nome" id="nome" type="text" class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm" required />
+                <x-input 
+                    wire:model="nome" 
+                    id="nome" 
+                    type="text" 
+                    class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm" 
+                    required 
+                />
                 <x-input-error :messages="$errors->get('nome')" class="mt-2" />
             </div>
 
             <div class="sm:col-span-3">
+                <x-input-label for="nome_contato" value="Nome do Contato" />
+                <x-input 
+                    wire:model="nome_contato" 
+                    id="nome_contato" 
+                    type="text" 
+                    class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm" 
+                />
+                <x-input-error :messages="$errors->get('nome_contato')" class="mt-2" />
+            </div>
+
+            <div class="sm:col-span-3">
                 <x-input-label for="email" value="E-mail" />
-                <x-input wire:model="email" id="email" type="email" class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm" />
+                <x-input 
+                    wire:model="email" 
+                    id="email" 
+                    type="email" 
+                    class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm" 
+                />
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
 
@@ -21,8 +42,8 @@
                     x-mask="(99) 99999-9999"
                     id="telefone" 
                     type="text" 
-                    class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm"
-                    required
+                    class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm" 
+                    required 
                 />
                 <x-input-error :messages="$errors->get('telefone')" class="mt-2" />
             </div>
@@ -36,7 +57,7 @@
                     x-mask="99999-999"
                     id="cep" 
                     type="text" 
-                    class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm"
+                    class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm" 
                 />
                 <x-input-error :messages="$errors->get('cep')" class="mt-2" />
             </div>
@@ -71,35 +92,13 @@
                 <x-input-error :messages="$errors->get('estado')" class="mt-2" />
             </div>
 
-            <!-- Flags -->
-            <div class="sm:col-span-6">
-                <div class="space-y-4">
-                    <label class="inline-flex items-center">
-                        <input 
-                            type="checkbox" 
-                            wire:model="iniciado_por_mim" 
-                            class="rounded border-gray-300 text-pk focus:ring-pk shadow-sm"
-                        >
-                        <span class="ml-2 text-sm text-gray-600">Iniciado por mim</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Campos adicionais -->
-            <div class="sm:col-span-3">
-                <x-input-label for="data_inicio" value="Data de Início" />
-                <x-input wire:model="data_inicio" id="data_inicio" type="date" class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm"/>
-                <x-input-error :messages="$errors->get('data_inicio')" class="mt-2" />
-            </div>
-
             <div class="sm:col-span-6">
                 <x-input-label for="observacoes" value="Observações" />
-                <textarea 
+                <x-textarea 
                     wire:model="observacoes" 
                     id="observacoes" 
                     class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm" 
-                    rows="3"
-                ></textarea>
+                />
                 <x-input-error :messages="$errors->get('observacoes')" class="mt-2" />
             </div>
         </div>
@@ -109,10 +108,8 @@
                 Cancelar
             </x-secondary-button>
             <x-primary-button type="submit">
-                {{ $contato && $contato->exists ? 'Atualizar' : 'Criar' }}
+                Salvar
             </x-primary-button>
         </div>
     </form>
 </div>
-
-

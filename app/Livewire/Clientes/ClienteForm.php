@@ -50,7 +50,11 @@ class ClienteForm extends Component
             'email' => [
                 'nullable',
                 'email',
-                Rule::unique('contatos', 'email')->ignore($this->contato?->id)
+                Rule::unique('contatos', 'email')
+                    ->ignore($this->contato?->id)
+                    ->where(function ($query) {
+                        $query->whereNotNull('email');
+                    }),
             ],
             'telefone' => [
                 'required',

@@ -33,13 +33,16 @@ class Contato extends Model
         'habilitado_fidelidade',
         'ativo',
         'user_id',
-        'papeis'
+        'papeis',
+        'iniciado_por_mim',
+        'nome_contato',
     ];
 
     protected $casts = [
         'papeis' => 'array',
         'habilitado_fidelidade' => 'boolean',
         'ativo' => 'boolean',
+        'iniciado_por_mim' => 'boolean',
     ];
 
     // Relacionamento com o usuário (consultor) que cadastrou o contato
@@ -118,6 +121,8 @@ class Contato extends Model
         $this->save();
     }
 }
+
+
 
 
 

@@ -1,4 +1,4 @@
-<div class="p-6">
+<div>
     <x-notification />
     {{-- Cabeçalho com Estatísticas --}}
     <div class="flex justify-between items-center mb-6">

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Consultores;
+namespace App\Livewire\Parceiros;
 
 use Livewire\Component;
 use Illuminate\Validation\Rule;
@@ -8,7 +8,7 @@ use App\Models\Contatos\Contato;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
-class ConsultorForm extends Component
+class ParceiroForm extends Component
 {
     public ?Contato $contato = null;
     
@@ -24,18 +24,16 @@ class ConsultorForm extends Component
     public $estado = '';
     public $observacoes = '';
     
-    // Campos adicionais
-    public $iniciado_por_mim = false;
-    public $data_inicio = '';
+    // Campo adicional
+    public $nome_contato = '';
 
     public function mount(?Contato $contato = null)
     {
-        if ($contato && $contato->isConsultor()) {
+        if ($contato && $contato->isParceiro()) {
             $this->contato = $contato;
             $this->nome = $contato->nome;
             $this->email = $contato->email;
             $this->telefone = $contato->telefone;
-            $this->data_inicio = $contato->data_inicio?->format('Y-m-d');
             
             // Campos de endereço
             $this->cep = $contato->cep;
@@ -47,7 +45,7 @@ class ConsultorForm extends Component
             
             // Campos adicionais
             $this->observacoes = $contato->observacoes;
-            $this->iniciado_por_mim = $contato->iniciado_por_mim;
+            $this->nome_contato = $contato->nome_contato;
         }
     }
 
@@ -68,13 +66,12 @@ class ConsultorForm extends Component
                 'required',
                 Rule::unique('contatos', 'telefone')->ignore($this->contato?->id)
             ],
-            'data_inicio' => 'nullable|date',
             'cep' => 'nullable',
             'endereco' => 'nullable',
             'numero' => 'nullable',
             'cidade' => 'nullable',
             'estado' => 'nullable',
-            'iniciado_por_mim' => 'boolean',
+            'nome_contato' => 'nullable|min:3',
         ];
     }
 
@@ -85,7 +82,7 @@ class ConsultorForm extends Component
         $this->reset([
             'nome', 'email', 'telefone',
             'cep', 'endereco', 'numero', 'complemento', 'cidade', 'estado',
-            'observacoes', 'iniciado_por_mim'
+            'observacoes', 'nome_contato'
         ]);
         $this->contato = null;
     }
@@ -127,34 +124,31 @@ class ConsultorForm extends Component
                 'cidade' => $this->cidade,
                 'estado' => $this->estado,
                 'observacoes' => $this->observacoes,
-                'iniciado_por_mim' => $this->iniciado_por_mim,
+                'nome_contato' => $this->nome_contato,
             ];
 
             if ($this->contato && $this->contato->exists) {
                 $this->contato->update($dados);
-                $message = 'Consultor atualizado com sucesso!';
+                $message = 'Parceiro atualizado com sucesso!';
             } else {
                 $dados['user_id'] = Auth::id();
-                $dados['papeis'] = ['consultor'];
+                $dados['papeis'] = ['parceiro'];
                 Contato::create($dados);
-                $message = 'Consultor criado com sucesso!';
+                $message = 'Parceiro criado com sucesso!';
             }
 
             $this->dispatch('notify', type: 'success', message: $message);
-            $this->dispatch('consultor-saved');
+            $this->dispatch('parceiro-saved');
             $this->dispatch('close');
             $this->resetForm();
             
         } catch (\Exception $e) {
-            $this->dispatch('notify', type: 'error', message: 'Erro ao salvar consultor: ' . $e->getMessage());
+            $this->dispatch('notify', type: 'error', message: 'Erro ao salvar parceiro: ' . $e->getMessage());
         }
     }
 
     public function render()
     {
-        return view('livewire.consultores.consultor-form');
+        return view('livewire.parceiros.parceiro-form');
     }
 }
-
-
-

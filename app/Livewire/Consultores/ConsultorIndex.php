@@ -14,6 +14,7 @@ class ConsultorIndex extends Component
     public $perPage = 10;
     public $sortField = 'nome';
     public $sortDirection = 'asc';
+    public $filtroStatus = 'todos';
     public $consultorEmEdicao;
     
     protected $listeners = [
@@ -83,6 +84,8 @@ class ConsultorIndex extends Component
                         ->orWhere('email', 'like', '%' . $this->search . '%')
                         ->orWhere('telefone', 'like', '%' . $this->search . '%');
                 });
+            })->when($this->filtroStatus !== 'todos', function ($query) {
+                $query->where('iniciado_por_mim', $this->filtroStatus === 'inicios');
             });
 
         $consultores = $query
@@ -92,7 +95,10 @@ class ConsultorIndex extends Component
         return view('livewire.consultores.consultor-index', [
             'consultores' => $consultores,
             'totalConsultores' => Contato::whereJsonContains('papeis', 'consultor')->count(),
+            'totalInicios' => Contato::whereJsonContains('papeis', 'consultor')->where('iniciado_por_mim', true)->count(),
+            'totalNormais' => Contato::whereJsonContains('papeis', 'consultor')->where('iniciado_por_mim', false)->count(),
         ]);
     }
 }
+
 

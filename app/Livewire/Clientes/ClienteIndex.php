@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Clientes;
 
-use App\Models\Contatos\Contato;
 use Livewire\Component;
+use App\Models\Contatos\Contato;
 use Livewire\WithPagination;
 
 class ClienteIndex extends Component

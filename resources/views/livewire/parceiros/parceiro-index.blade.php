@@ -5,23 +5,9 @@
         <div class="flex-1">
             <x-slot name="header">
                 <h2 class="font-semibold text-xl text-white leading-tight">
-                    Consultores
+                    Parceiros
                 </h2>
             </x-slot>
-            <div class="mt-1 flex space-x-4 text-sm text-gray-600">
-                <span>Total: {{ $totalConsultores }}</span>
-                <span>Inícios: {{ $totalInicios }}</span>
-                <span>Normais: {{ $totalNormais }}</span>
-            </div>
-        </div>
-        <div>
-            <x-primary-button
-                type="button"
-                x-data=""
-                x-on:click.prevent="$dispatch('open-modal', 'novo-consultor');"
-            >
-                Novo Consultor
-            </x-primary-button>
         </div>
     </div>
 
@@ -31,16 +17,9 @@
             <x-input
                 wire:model.live.debounce.300ms="search"
                 type="search"
-                placeholder="Buscar consultores..."
+                placeholder="Buscar parceiros..."
                 class="block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm"
             />
-        </div>
-        <div>
-            <x-select wire:model.live="filtroStatus" class="block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm">
-                <option value="todos">Todos</option>
-                <option value="inicios">Inícios</option>
-                <option value="normais">Normais</option>
-            </x-select>
         </div>
         <div>
             <x-select wire:model.live="perPage" class="block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm">
@@ -49,9 +28,17 @@
                 <option value="50">50 por página</option>
             </x-select>
         </div>
+        <div>
+            <x-primary-button
+                type="button"
+                x-data=""
+                x-on:click.prevent="$dispatch('open-modal', 'novo-parceiro');"
+            >
+                Novo Parceiro
+            </x-primary-button>
+        </div>
     </div>
 
-    {{-- Tabela --}}
     <div class="overflow-x-auto bg-white rounded-lg shadow">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -59,6 +46,12 @@
                     <th wire:click="sortBy('nome')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                         Nome
                         @if ($sortField === 'nome')
+                            <span class="ml-1">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                        @endif
+                    </th>
+                    <th wire:click="sortBy('nome_contato')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                        Nome do Contato
+                        @if ($sortField === 'nome_contato')
                             <span class="ml-1">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
                         @endif
                     </th>
@@ -74,37 +67,27 @@
                             <span class="ml-1">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
                         @endif
                     </th>
-                    <th wire:click="sortBy('iniciado_por_mim')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                        Iniciado por mim
-                        @if ($sortField === 'iniciado_por_mim')
-                            <span class="ml-1">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
-                        @endif
-                    </th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                @forelse($consultores as $consultor)
+                @forelse($parceiros as $parceiro)
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $consultor->nome }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $consultor->email }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $consultor->telefone }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $consultor->iniciado_por_mim ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                {{ $consultor->iniciado_por_mim ? 'Sim' : 'Não' }}
-                            </span>
-                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $parceiro->nome }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $parceiro->nome_contato }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $parceiro->email }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $parceiro->telefone }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <x-secondary-button
-                                wire:click="edit({{ $consultor->id }})"
+                                wire:click="edit({{ $parceiro->id }})"
                                 x-data=""
-                                x-on:click="$dispatch('open-modal', 'editar-consultor')"
+                                x-on:click="$dispatch('open-modal', 'editar-parceiro')"
                             >
                                 Editar
                             </x-secondary-button>
                             <x-danger-button
-                                wire:click="delete({{ $consultor->id }})"
-                                wire:confirm="Tem certeza que deseja excluir este consultor?"
+                                wire:click="delete({{ $parceiro->id }})"
+                                wire:confirm="Tem certeza que deseja remover este parceiro?"
                             >
                                 Excluir
                             </x-danger-button>
@@ -113,7 +96,7 @@
                 @empty
                     <tr>
                         <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                            Nenhum consultor encontrado
+                            Nenhum parceiro encontrado
                         </td>
                     </tr>
                 @endforelse
@@ -121,35 +104,30 @@
         </table>
     </div>
 
-    {{-- Paginação --}}
     <div class="mt-4">
-        {{ $consultores->links() }}
+        {{ $parceiros->links() }}
     </div>
 
-    {{-- Modais --}}
-    <x-modal name="novo-consultor" :show="false">
+    <x-modal name="novo-parceiro" :show="false">
         <div class="p-6">
             <h2 class="text-lg font-medium text-gray-900 mb-4">
-                Novo Consultor
+                Novo Parceiro
             </h2>
-            <livewire:consultores.consultor-form />
+            <livewire:parceiros.parceiro-form/>
         </div>
     </x-modal>
 
-    <x-modal name="editar-consultor" :show="false">
+    <x-modal name="editar-parceiro" :show="false">
         <div class="p-6">
             <h2 class="text-lg font-medium text-gray-900 mb-4">
-                Editar Consultor
+                Editar Parceiro
             </h2>
-            @if($consultorEmEdicao)
-                <livewire:consultores.consultor-form
-                    :contato="$consultorEmEdicao"
-                    :key="'edit-'.$consultorEmEdicao->id"
+            @if($parceiroEmEdicao)
+                <livewire:parceiros.parceiro-form
+                    :contato="$parceiroEmEdicao"
+                    :key="'edit-'.$parceiroEmEdicao->id"
                 />
             @endif
         </div>
     </x-modal>
 </div>
-
-
-
