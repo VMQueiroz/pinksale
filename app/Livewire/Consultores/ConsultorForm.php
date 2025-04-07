@@ -2,13 +2,13 @@
 
 namespace App\Livewire\Consultores;
 
-use App\Models\Consultores\Consultor;
+use App\Models\Contatos\Contato;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 
 class ConsultorForm extends Component
 {
-    public ?Consultor $consultor = null;
+    public ?Contato $contato = null;
     
     // Campos básicos
     public $nome = '';
@@ -18,18 +18,44 @@ class ConsultorForm extends Component
     public $status = 'ativo';
     public $data_inicio = '';
     public $meta_mensal = 0;
+    
+    // Campos de endereço
+    public $cep = '';
+    public $endereco = '';
+    public $numero = '';
+    public $complemento = '';
+    public $cidade = '';
+    public $estado = '';
+    
+    // Campos adicionais
+    public $dia_aniversario = '';
+    public $mes_aniversario = '';
+    public $observacoes = '';
 
-    public function mount(?Consultor $consultor = null)
+    public function mount(?Contato $contato = null)
     {
-        if ($consultor) {
-            $this->consultor = $consultor;
-            $this->nome = $consultor->nome;
-            $this->email = $consultor->email;
-            $this->telefone = $consultor->telefone;
-            $this->nivel = $consultor->nivel;
-            $this->status = $consultor->status;
-            $this->data_inicio = $consultor->data_inicio?->format('Y-m-d');
-            $this->meta_mensal = $consultor->meta_mensal;
+        if ($contato && $contato->isConsultor()) {
+            $this->contato = $contato;
+            $this->nome = $contato->nome;
+            $this->email = $contato->email;
+            $this->telefone = $contato->telefone;
+            $this->nivel = $contato->nivel;
+            $this->status = $contato->status;
+            $this->data_inicio = $contato->data_inicio?->format('Y-m-d');
+            $this->meta_mensal = $contato->meta_mensal;
+            
+            // Campos de endereço
+            $this->cep = $contato->cep;
+            $this->endereco = $contato->endereco;
+            $this->numero = $contato->numero;
+            $this->complemento = $contato->complemento;
+            $this->cidade = $contato->cidade;
+            $this->estado = $contato->estado;
+            
+            // Campos adicionais
+            $this->dia_aniversario = $contato->dia_aniversario;
+            $this->mes_aniversario = $contato->mes_aniversario;
+            $this->observacoes = $contato->observacoes;
         }
     }
 
@@ -43,6 +69,13 @@ class ConsultorForm extends Component
             'status' => 'required|in:ativo,inativo,suspenso,em_treinamento',
             'data_inicio' => 'required|date',
             'meta_mensal' => 'required|numeric|min:0',
+            'cep' => 'required',
+            'endereco' => 'required',
+            'numero' => 'required',
+            'cidade' => 'required',
+            'estado' => 'required',
+            'dia_aniversario' => 'nullable|numeric|min:1|max:31',
+            'mes_aniversario' => 'nullable|numeric|min:1|max:12',
         ];
     }
 
@@ -58,14 +91,24 @@ class ConsultorForm extends Component
             'status' => $this->status,
             'data_inicio' => $this->data_inicio,
             'meta_mensal' => $this->meta_mensal,
+            'cep' => $this->cep,
+            'endereco' => $this->endereco,
+            'numero' => $this->numero,
+            'complemento' => $this->complemento,
+            'cidade' => $this->cidade,
+            'estado' => $this->estado,
+            'dia_aniversario' => $this->dia_aniversario,
+            'mes_aniversario' => $this->mes_aniversario,
+            'observacoes' => $this->observacoes,
         ];
         
-        if ($this->consultor) {
-            $this->consultor->update($dados);
+        if ($this->contato) {
+            $this->contato->update($dados);
             $this->dispatch('notify', ['message' => 'Consultor atualizado com sucesso!']);
         } else {
             $dados['user_id'] = Auth::id();
-            Consultor::create($dados);
+            $dados['papeis'] = ['consultor'];
+            Contato::create($dados);
             $this->dispatch('notify', ['message' => 'Consultor criado com sucesso!']);
         }
 
@@ -90,3 +133,4 @@ class ConsultorForm extends Component
         ]);
     }
 }
+

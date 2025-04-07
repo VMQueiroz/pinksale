@@ -107,7 +107,7 @@
                         <a href="#" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white">Parceiros</a>
                         <a href="#" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white">Sessões</a>
                         <a href="#" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white">Urnas</a>
-                        <a href="#" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white">Consultores</a>
+                        <a href="{{ route('consultores.index') }}" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white">Consultores</a>
                         <a href="#" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white">Aniversariantes</a>
                     </div>
                 </div>
