@@ -36,6 +36,7 @@ class Contato extends Model
         'papeis',
         'iniciado_por_mim',
         'nome_contato',
+        'data_inicio', // Adicionando o novo campo
     ];
 
     protected $casts = [
@@ -43,6 +44,7 @@ class Contato extends Model
         'habilitado_fidelidade' => 'boolean',
         'ativo' => 'boolean',
         'iniciado_por_mim' => 'boolean',
+        'data_inicio' => 'date', // Adicionando o cast para data
     ];
 
     // Relacionamento com o usuário (consultor) que cadastrou o contato
@@ -121,6 +123,7 @@ class Contato extends Model
         $this->save();
     }
 }
+
 
 
 

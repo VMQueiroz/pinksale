@@ -17,7 +17,6 @@ class ContatosSeeder extends Seeder
             [
                 'user_id'            => 1, // ID do usuário (consultor) que cadastrou o contato
                 'nome'               => fake()->name(),
-                'nome'               => fake()->name(),
                 'email'              => fake()->email(),
                 'telefone'           => '(11) 91234-5678',
                 'cep'                => '12345-678',
@@ -32,6 +31,8 @@ class ContatosSeeder extends Seeder
                 'tipo_de_pele'       => 'Normal',
                 'tom_de_pele'        => 'Neutro',
                 'nome_contato'       => null,
+                'iniciado_por_mim'   => true,
+                'data_inicio'        => now(),
                 'papeis'             => json_encode(['abordagem', 'cliente']),
                 'habilitado_fidelidade' => false,
                 'ativo'              => true,
@@ -89,3 +90,4 @@ class ContatosSeeder extends Seeder
         ]);
     }
 }
+

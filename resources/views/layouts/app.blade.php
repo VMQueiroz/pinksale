@@ -54,7 +54,7 @@
         <!-- Logo Area -->
         <div class="flex items-center justify-center h-16 flex-shrink-0 px-4 border-b border-gray-200" :class="isCollapsed ? 'justify-center' : 'justify-start'">
             {{-- Logos change based on isCollapsed state. Ensure files exist in public/img/ --}}
-            <img :src="isCollapsed ? '/img/logo-pinksale-icon_2.png' : '/img/logo-pinksale-full_2.png'"
+            <img :src="isCollapsed ? '/img/logo-pinksale-icon.png' : '/img/logo-pinksale-full.png'"
                  alt="Logo PinkSale"
                  :class="isCollapsed ? 'h-12' : 'h-14'" {{-- Dynamic height based on isCollapsed --}}
                  class="transition-all duration-300">

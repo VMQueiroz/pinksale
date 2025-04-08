@@ -77,7 +77,7 @@
                     <label class="inline-flex items-center">
                         <input 
                             type="checkbox" 
-                            wire:model="iniciado_por_mim" 
+                            wire:model.live="iniciado_por_mim" 
                             class="rounded border-gray-300 text-pk focus:ring-pk shadow-sm"
                         >
                         <span class="ml-2 text-sm text-gray-600">Iniciado por mim</span>
@@ -86,11 +86,19 @@
             </div>
 
             <!-- Campos adicionais -->
-            <div class="sm:col-span-3">
-                <x-input-label for="data_inicio" value="Data de Início" />
-                <x-input wire:model="data_inicio" id="data_inicio" type="date" class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm"/>
-                <x-input-error :messages="$errors->get('data_inicio')" class="mt-2" />
-            </div>
+            @if($iniciado_por_mim)
+                <div class="sm:col-span-3">
+                    <x-input-label for="data_inicio" value="Data de Início" />
+                    <x-input 
+                        wire:model="data_inicio" 
+                        id="data_inicio" 
+                        type="date" 
+                        class="mt-1 block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm"
+                        required
+                    />
+                    <x-input-error :messages="$errors->get('data_inicio')" class="mt-2" />
+                </div>
+            @endif
 
             <div class="sm:col-span-6">
                 <x-input-label for="observacoes" value="Observações" />
@@ -114,5 +122,6 @@
         </div>
     </form>
 </div>
+
 
 

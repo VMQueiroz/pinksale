@@ -26,7 +26,7 @@ class ConsultorForm extends Component
     
     // Campos adicionais
     public $iniciado_por_mim = false;
-    public $data_inicio = '';
+    public $data_inicio = null;
 
     public function mount(?Contato $contato = null)
     {
@@ -53,7 +53,7 @@ class ConsultorForm extends Component
 
     protected function rules()
     {
-        return [
+        $rules = [
             'nome' => 'required|min:3',
             'email' => [
                 'nullable',
@@ -68,7 +68,6 @@ class ConsultorForm extends Component
                 'required',
                 Rule::unique('contatos', 'telefone')->ignore($this->contato?->id)
             ],
-            'data_inicio' => 'nullable|date',
             'cep' => 'nullable',
             'endereco' => 'nullable',
             'numero' => 'nullable',
@@ -76,17 +75,22 @@ class ConsultorForm extends Component
             'estado' => 'nullable',
             'iniciado_por_mim' => 'boolean',
         ];
+
+        // Adiciona validação condicional para data_inicio
+        if ($this->iniciado_por_mim) {
+            $rules['data_inicio'] = 'required|date';
+        } else {
+            $rules['data_inicio'] = 'nullable|date';
+        }
+
+        return $rules;
     }
 
     protected $listeners = ['close' => 'resetForm'];
 
     public function resetForm()
     {
-        $this->reset([
-            'nome', 'email', 'telefone',
-            'cep', 'endereco', 'numero', 'complemento', 'cidade', 'estado',
-            'observacoes', 'iniciado_por_mim'
-        ]);
+        $this->reset();
         $this->contato = null;
     }
 
@@ -128,6 +132,7 @@ class ConsultorForm extends Component
                 'estado' => $this->estado,
                 'observacoes' => $this->observacoes,
                 'iniciado_por_mim' => $this->iniciado_por_mim,
+                'data_inicio' => $this->data_inicio,
             ];
 
             if ($this->contato && $this->contato->exists) {
@@ -154,7 +159,17 @@ class ConsultorForm extends Component
     {
         return view('livewire.consultores.consultor-form');
     }
+
+    // Adicionar um método para atualizar a validação quando o checkbox mudar
+    public function updatedIniciadoPorMim()
+    {
+        if (!$this->iniciado_por_mim) {
+            $this->data_inicio = null;
+        }
+        $this->validateOnly('data_inicio');
+    }
 }
+
 
 
 
