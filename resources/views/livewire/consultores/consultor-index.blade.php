@@ -144,12 +144,13 @@
             @if($consultorEmEdicao)
                 <livewire:consultores.consultor-form
                     :contato="$consultorEmEdicao"
-                    :key="'edit-'.$consultorEmEdicao->id"
+                    :key="'consultor-form-'.$consultorEmEdicao->id"
                 />
             @endif
         </div>
     </x-modal>
 </div>
+
 
 
 

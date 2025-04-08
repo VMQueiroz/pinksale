@@ -86,12 +86,25 @@ class ConsultorForm extends Component
         return $rules;
     }
 
-    protected $listeners = ['close' => 'resetForm'];
+    protected $listeners = [
+        'close' => 'resetForm'
+    ];
 
     public function resetForm()
-    {
-        $this->reset();
+    {   
+        $this->reset();    
         $this->contato = null;
+    }
+
+    public function cancel()
+    {
+        if ($this->contato) {
+            $this->mount($this->contato);
+        } else {
+            $this->resetForm();
+        }
+        // Primeiro restaura os dados, depois fecha o modal
+        $this->dispatch('close-modal', modal: 'editar-consultor');
     }
 
     public function buscarCep()
@@ -147,7 +160,7 @@ class ConsultorForm extends Component
 
             $this->dispatch('notify', type: 'success', message: $message);
             $this->dispatch('consultor-saved');
-            $this->dispatch('close');
+            $this->dispatch('close-modal', modal: 'editar-consultor');
             $this->resetForm();
             
         } catch (\Exception $e) {
@@ -169,6 +182,10 @@ class ConsultorForm extends Component
         $this->validateOnly('data_inicio');
     }
 }
+
+
+
+
 
 
 

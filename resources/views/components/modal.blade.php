@@ -19,14 +19,18 @@ $maxWidth = [
     x-show="show"
     x-on:close.window="show = false"
     x-on:open-modal.window="if ($event.detail === id) show = true"
-    x-on:close-modal.window="if ($event.detail.modal === id) { show = false; $el.querySelector('[x-show]')?.removeAttribute('style'); }"
+    x-on:close-modal.window="if ($event.detail.modal === id) { 
+        show = false; 
+        $el.querySelector('[x-show]')?.removeAttribute('style');
+        $dispatch('close-modal', { modal: id });
+    }"
     class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50"
     style="display: none;"
 >
     <div 
         x-show="show"
         class="fixed inset-0 transform transition-all"
-        x-on:click="show = false"
+        x-on:click="$dispatch('close-modal', { modal: id })"
         x-transition:enter="ease-out duration-300"
         x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100"
@@ -50,4 +54,5 @@ $maxWidth = [
         {{ $slot }}
     </div>
 </div>
+
 

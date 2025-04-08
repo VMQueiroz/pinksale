@@ -113,7 +113,7 @@
         </div>
 
         <div class="mt-6 flex justify-end gap-x-4">
-            <x-secondary-button x-on:click="$dispatch('close')">
+            <x-secondary-button type="button" wire:click="cancel">
                 Cancelar
             </x-secondary-button>
             <x-primary-button type="submit">
@@ -122,6 +122,7 @@
         </div>
     </form>
 </div>
+
 
 
 

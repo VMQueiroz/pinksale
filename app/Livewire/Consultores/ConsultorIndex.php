@@ -18,10 +18,16 @@ class ConsultorIndex extends Component
     public $consultorEmEdicao;
     
     protected $listeners = [
-        'consultor-saved' => 'handleConsultorSaved'
+        'consultor-saved' => 'handleConsultorSaved',
+        'close-modal' => 'handleCloseModal'
     ];
 
     public function handleConsultorSaved()
+    {
+        $this->dispatch('notify', type: 'success', message: 'Consultor salvo com sucesso!');
+    }
+
+    public function handleCloseModal()
     {
         $this->reset('consultorEmEdicao');
     }
@@ -100,5 +106,7 @@ class ConsultorIndex extends Component
         ]);
     }
 }
+
+
 
 
