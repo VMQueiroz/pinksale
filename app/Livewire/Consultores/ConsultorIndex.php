@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Consultores;
 
-use App\Models\Contatos\Contato;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Models\Contatos\Contato;
 
 class ConsultorIndex extends Component
 {
@@ -24,7 +24,7 @@ class ConsultorIndex extends Component
 
     public function handleConsultorSaved()
     {
-        $this->dispatch('notify', type: 'success', message: 'Consultor salvo com sucesso!');
+        //$this->reset('consultorEmEdicao');
     }
 
     public function handleCloseModal()
@@ -65,18 +65,12 @@ class ConsultorIndex extends Component
         $consultor = Contato::find($consultorId);
         if ($consultor) {
             if ($consultor->vendasComoConsultor()->exists()) {
-                $this->dispatch('notify', [
-                    'type' => 'error',
-                    'message' => 'Não é possível excluir um consultor com vendas vinculadas'
-                ]);
+                $this->dispatch('notify', type: 'error', message: 'Não é possível excluir um consultor com vendas vinculadas!');
                 return;
             }
 
             $consultor->delete();
-            $this->dispatch('notify', [
-                'type' => 'success',
-                'message' => 'Consultor excluído com sucesso!'
-            ]);
+            $this->dispatch('notify', type: 'success', message: 'Consultor excluído com sucesso!');
         }
     }
 
@@ -106,7 +100,3 @@ class ConsultorIndex extends Component
         ]);
     }
 }
-
-
-
-

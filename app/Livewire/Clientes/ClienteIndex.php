@@ -16,32 +16,9 @@ class ClienteIndex extends Component
     public $sortDirection = 'asc';
     public $filtroStatus = 'todos';
     public $clienteEmEdicao;
-    
-    protected $listeners = [
-        'cliente-saved' => 'handleClienteSaved'
-    ];
-
-    public function handleClienteSaved()
-    {
-        $this->reset('clienteEmEdicao');
-    }
-
-    public function edit($clienteId)
-    {
-        $this->clienteEmEdicao = Contato::find($clienteId);
-        
-        if ($this->clienteEmEdicao) {
-            $this->dispatch('open-modal', 'editar-cliente');
-        }
-    }
-
-    public function create()
-    {
-        $this->dispatch('open-modal', 'novo-cliente');
-    }
 
     public ?Contato $contato = null;
-    
+
     // Campos básicos
     public $nome = '';
     public $email = '';
@@ -61,6 +38,35 @@ class ClienteIndex extends Component
     public $tom_de_pele = '';
     public $habilitado_fidelidade = true;
     public $ativo = true;
+    
+    protected $listeners = [
+        'cliente-saved' => 'handleClienteSaved',
+        'close-modal' => 'handleCloseModal'
+    ];
+
+    public function handleClienteSaved()
+    {
+        //$this->reset('clienteEmEdicao');
+    }
+
+    public function handleCloseModal()
+    {
+        $this->reset('clienteEmEdicao');
+    }
+
+    public function edit($clienteId)
+    {
+        $this->clienteEmEdicao = Contato::find($clienteId);
+        
+        if ($this->clienteEmEdicao) {
+            $this->dispatch('open-modal', 'editar-cliente');
+        }
+    }
+
+    public function create()
+    {
+        $this->dispatch('open-modal', 'novo-cliente');
+    }
 
     public function updatingSearch()
     {
@@ -80,27 +86,20 @@ class ClienteIndex extends Component
     {
         $cliente = Contato::find($clienteId);
         if ($cliente) {
-
             if ($cliente->vendasComoCliente()->exists()) {
-                $this->dispatch('notify', [
-                    'type' => 'error',
-                    'message' => 'Não é possível excluir um cliente com vendas vinculadas'
-                ]);
+                $this->dispatch('notify', type: 'error', message: 'Não é possível excluir um cliente com vendas vinculadas!');
                 return;
             }
 
             $cliente->delete();
-            $this->dispatch('notify', [
-                'type' => 'success',
-                'message' => 'Cliente excluído com sucesso!'
-            ]);
+            $this->dispatch('notify', type: 'success', message: 'Cliente excluído com sucesso!');
         }
     }
 
     public function render()
     {
         $query = Contato::query()
-            ->where('papeis', 'like', '%cliente%')
+            ->whereJsonContains('papeis', 'cliente')
             ->when($this->search, function ($query) {
                 $query->where(function ($query) {
                     $query->where('nome', 'like', '%' . $this->search . '%')
@@ -118,9 +117,9 @@ class ClienteIndex extends Component
 
         return view('livewire.clientes.cliente-index', [
             'clientes' => $clientes,
-            'totalClientes' => Contato::where('papeis', 'like', '%cliente%')->count(),
-            'totalAtivos' => Contato::where('papeis', 'like', '%cliente%')->where('ativo', true)->count(),
-            'totalInativos' => Contato::where('papeis', 'like', '%cliente%')->where('ativo', false)->count(),
+            'totalClientes' => Contato::whereJsonContains('papeis', 'cliente')->count(),
+            'totalAtivos' => Contato::whereJsonContains('papeis', 'cliente')->where('ativo', true)->count(),
+            'totalInativos' => Contato::whereJsonContains('papeis', 'cliente')->where('ativo', false)->count(),
         ]);
     }
 }

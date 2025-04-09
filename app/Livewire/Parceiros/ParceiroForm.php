@@ -75,7 +75,7 @@ class ParceiroForm extends Component
         ];
     }
 
-    protected $listeners = ['close' => 'resetForm'];
+    protected $listeners = ['close-modal' => 'resetForm'];
 
     public function resetForm()
     {
@@ -89,23 +89,27 @@ class ParceiroForm extends Component
 
     public function buscarCep()
     {
-        $cep = preg_replace('/[^0-9]/', '', $this->cep);
+        $cepService = app(\App\Services\CepService::class);
+        
+        $dados = $cepService->buscarDados($this->cep);
 
-        if (strlen($cep) === 8) {
-            try {
-                $response = Http::get("https://viacep.com.br/ws/{$cep}/json/");
-                if ($response->successful()) {
-                    $dados = $response->json();
-                    if (!isset($dados['erro'])) {
-                        $this->endereco = $dados['logradouro'];
-                        $this->cidade = $dados['localidade'];
-                        $this->estado = $dados['uf'];
-                    }
-                }
-            } catch (\Exception $e) {
-                // Silently fail
-            }
+        if ($dados) {
+            $this->endereco = $dados['logradouro'] ?? '';
+            $this->cidade   = $dados['localidade'] ?? '';
+            $this->estado   = $dados['uf'] ?? '';
         }
+    }
+
+    public function cancel()  // Adicionado método cancel
+    {
+        if ($this->contato) {
+            $this->mount($this->contato);
+            $this->dispatch('close-modal', modal: 'editar-parceiro');
+        } else {
+            $this->resetForm();
+            $this->dispatch('close-modal', modal: 'novo-parceiro');
+        }
+        
     }
 
     public function save()
@@ -139,7 +143,7 @@ class ParceiroForm extends Component
 
             $this->dispatch('notify', type: 'success', message: $message);
             $this->dispatch('parceiro-saved');
-            $this->dispatch('close');
+            $this->dispatch('close-modal', modal: 'editar-parceiro');  // Alterado para usar modal específico
             $this->resetForm();
             
         } catch (\Exception $e) {
@@ -152,3 +156,4 @@ class ParceiroForm extends Component
         return view('livewire.parceiros.parceiro-form');
     }
 }
+

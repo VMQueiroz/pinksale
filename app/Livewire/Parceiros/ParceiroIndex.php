@@ -17,10 +17,16 @@ class ParceiroIndex extends Component
     public $parceiroEmEdicao;
     
     protected $listeners = [
-        'parceiro-saved' => 'handleParceiroSaved'
+        'parceiro-saved' => 'handleParceiroSaved',
+        'close-modal' => 'handleCloseModal'
     ];
 
     public function handleParceiroSaved()
+    {
+        //$this->reset('parceiroEmEdicao');
+    }
+
+    public function handleCloseModal()
     {
         $this->reset('parceiroEmEdicao');
     }

@@ -1,7 +1,8 @@
 <div>
-    <form wire:submit="save">
-        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-            <div class="sm:col-span-3">
+    <form wire:submit="save" class="space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-6 gap-4">
+            <!-- Campos básicos -->
+            <div class="sm:col-span-4">
                 <x-input-label for="nome" value="Nome" />
                 <x-input 
                     wire:model="nome" 
@@ -104,11 +105,11 @@
         </div>
 
         <div class="mt-6 flex justify-end gap-x-4">
-            <x-secondary-button x-on:click="$dispatch('close')">
+            <x-secondary-button type="button" wire:click="cancel">
                 Cancelar
             </x-secondary-button>
             <x-primary-button type="submit">
-                Salvar
+                {{ $contato && $contato->exists ? 'Atualizar' : 'Criar' }}
             </x-primary-button>
         </div>
     </form>

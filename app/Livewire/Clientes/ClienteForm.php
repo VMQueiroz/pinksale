@@ -5,7 +5,6 @@ namespace App\Livewire\Clientes;
 use Livewire\Component;
 use App\Models\Contatos\Contato;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\Rule;
 
 class ClienteForm extends Component
@@ -28,7 +27,7 @@ class ClienteForm extends Component
     public $habilitado_fidelidade = true;
     public $ativo = true;
 
-    protected $listeners = ['close' => 'resetForm'];
+    protected $listeners = ['close-modal' => 'resetForm'];
 
     public function resetForm()
     {
@@ -97,23 +96,27 @@ class ClienteForm extends Component
 
     public function buscarCep()
     {
-        $cep = preg_replace('/[^0-9]/', '', $this->cep);
+        $cepService = app(\App\Services\CepService::class);
+        
+        $dados = $cepService->buscarDados($this->cep);
 
-        if (strlen($cep) === 8) {
-            try {
-                $response = Http::get("https://viacep.com.br/ws/{$cep}/json/");
-                if ($response->successful()) {
-                    $dados = $response->json();
-                    if (!isset($dados['erro'])) {
-                        $this->endereco = $dados['logradouro'];
-                        $this->cidade = $dados['localidade'];
-                        $this->estado = $dados['uf'];
-                    }
-                }
-            } catch (\Exception $e) {
-                // Silently fail
-            }
+        if ($dados) {
+            $this->endereco = $dados['logradouro'] ?? '';
+            $this->cidade   = $dados['localidade'] ?? '';
+            $this->estado   = $dados['uf'] ?? '';
         }
+    }
+
+    public function cancel()  // Adicionado método cancel
+    {
+        if ($this->contato) {
+            $this->mount($this->contato);
+            $this->dispatch('close-modal', modal: 'editar-cliente');
+        } else {
+            $this->resetForm();
+            $this->dispatch('close-modal', modal: 'novo-cliente');
+        }
+        
     }
 
     public function save()
@@ -152,7 +155,7 @@ class ClienteForm extends Component
 
             $this->dispatch('notify', type: 'success', message: $message);
             $this->dispatch('cliente-saved');
-            $this->dispatch('close');
+            $this->dispatch('close-modal', modal: 'editar-cliente');
             $this->resetForm();
             
         } catch (\Exception $e) {
@@ -165,17 +168,3 @@ class ClienteForm extends Component
         return view('livewire.clientes.cliente-form');
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

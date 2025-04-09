@@ -124,7 +124,7 @@
             @if($clienteEmEdicao)
                 <livewire:clientes.cliente-form
                     :contato="$clienteEmEdicao"
-                    :key="'edit-'.$clienteEmEdicao->id"
+                    :key="'cliente-form-'.$clienteEmEdicao->id"
                 />
             @endif
         </div>

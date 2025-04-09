@@ -6,7 +6,6 @@ use Livewire\Component;
 use Illuminate\Validation\Rule;
 use App\Models\Contatos\Contato;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 
 class ConsultorForm extends Component
 {
@@ -87,7 +86,7 @@ class ConsultorForm extends Component
     }
 
     protected $listeners = [
-        'close' => 'resetForm'
+        'close-modal' => 'resetForm'
     ];
 
     public function resetForm()
@@ -96,35 +95,28 @@ class ConsultorForm extends Component
         $this->contato = null;
     }
 
-    public function cancel()
+    public function cancel()  // Adicionado método cancel
     {
         if ($this->contato) {
             $this->mount($this->contato);
+            $this->dispatch('close-modal', modal: 'editar-consultor');
         } else {
             $this->resetForm();
+            $this->dispatch('close-modal', modal: 'novo-consultor');
         }
-        // Primeiro restaura os dados, depois fecha o modal
-        $this->dispatch('close-modal', modal: 'editar-consultor');
+        
     }
 
     public function buscarCep()
     {
-        $cep = preg_replace('/[^0-9]/', '', $this->cep);
+        $cepService = app(\App\Services\CepService::class);
+        
+        $dados = $cepService->buscarDados($this->cep);
 
-        if (strlen($cep) === 8) {
-            try {
-                $response = Http::get("https://viacep.com.br/ws/{$cep}/json/");
-                if ($response->successful()) {
-                    $dados = $response->json();
-                    if (!isset($dados['erro'])) {
-                        $this->endereco = $dados['logradouro'];
-                        $this->cidade = $dados['localidade'];
-                        $this->estado = $dados['uf'];
-                    }
-                }
-            } catch (\Exception $e) {
-                // Silently fail
-            }
+        if ($dados) {
+            $this->endereco = $dados['logradouro'] ?? '';
+            $this->cidade   = $dados['localidade'] ?? '';
+            $this->estado   = $dados['uf'] ?? '';
         }
     }
 
@@ -151,16 +143,18 @@ class ConsultorForm extends Component
             if ($this->contato && $this->contato->exists) {
                 $this->contato->update($dados);
                 $message = 'Consultor atualizado com sucesso!';
+                $nomemodal = 'editar-consultor';
             } else {
                 $dados['user_id'] = Auth::id();
                 $dados['papeis'] = ['consultor'];
                 Contato::create($dados);
                 $message = 'Consultor criado com sucesso!';
+                $nomemodal = 'novo-consultor';
             }
 
             $this->dispatch('notify', type: 'success', message: $message);
             $this->dispatch('consultor-saved');
-            $this->dispatch('close-modal', modal: 'editar-consultor');
+            $this->dispatch('close-modal', modal: $nomemodal);
             $this->resetForm();
             
         } catch (\Exception $e) {
@@ -182,11 +176,3 @@ class ConsultorForm extends Component
         $this->validateOnly('data_inicio');
     }
 }
-
-
-
-
-
-
-
-

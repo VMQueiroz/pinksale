@@ -9,6 +9,15 @@
                 </h2>
             </x-slot>
         </div>
+        <div>
+            <x-primary-button
+                type="button"
+                x-data=""
+                x-on:click.prevent="$dispatch('open-modal', 'novo-parceiro');"
+            >
+                Novo Parceiro
+            </x-primary-button>
+        </div>
     </div>
 
     {{-- Filtros e Controles --}}
@@ -28,17 +37,9 @@
                 <option value="50">50 por página</option>
             </x-select>
         </div>
-        <div>
-            <x-primary-button
-                type="button"
-                x-data=""
-                x-on:click.prevent="$dispatch('open-modal', 'novo-parceiro');"
-            >
-                Novo Parceiro
-            </x-primary-button>
-        </div>
     </div>
 
+    {{-- Tabela --}}
     <div class="overflow-x-auto bg-white rounded-lg shadow">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -108,12 +109,15 @@
         {{ $parceiros->links() }}
     </div>
 
+    {{-- Modais --}}
     <x-modal name="novo-parceiro" :show="false">
         <div class="p-6">
             <h2 class="text-lg font-medium text-gray-900 mb-4">
                 Novo Parceiro
             </h2>
-            <livewire:parceiros.parceiro-form/>
+            <livewire:parceiros.parceiro-form
+            :key="'parceiro-form-novo'"
+            />
         </div>
     </x-modal>
 
@@ -125,7 +129,7 @@
             @if($parceiroEmEdicao)
                 <livewire:parceiros.parceiro-form
                     :contato="$parceiroEmEdicao"
-                    :key="'edit-'.$parceiroEmEdicao->id"
+                    :key="'parceiro-form-'.$parceiroEmEdicao->id"
                 />
             @endif
         </div>

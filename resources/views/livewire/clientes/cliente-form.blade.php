@@ -211,10 +211,7 @@
 
         <!-- Botões -->
         <div class="flex justify-end space-x-3 mt-6">
-            <x-secondary-button 
-                type="button" 
-                x-on:click="$dispatch('close'); $wire.resetForm()"
-            >
+            <x-secondary-button type="button" wire:click="cancel">
                 Cancelar
             </x-secondary-button>
 
