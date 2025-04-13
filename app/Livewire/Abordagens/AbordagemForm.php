@@ -89,6 +89,13 @@ class AbordagemForm extends Component
         'close-modal' => 'resetForm'
     ];
 
+    // Atualiza a interface quando o tipo de abordagem muda
+    public function updatedTipoAbordagem()
+    {
+        // Este método é chamado automaticamente quando o valor de tipo_abordagem é alterado
+        // Podemos adicionar lógica adicional aqui se necessário
+    }
+
     public function resetForm()
     {
         $this->reset();
@@ -166,19 +173,19 @@ class AbordagemForm extends Component
     public function criarEntrevista()
     {
         // Implementação futura para criar entrevista
-        $this->dispatch('notify', type: 'info', message: 'Funcionalidade de criar entrevista será implementada em breve.');
+        $this->dispatch('notify', type: 'info', message: 'Agendando entrevista para ' . $this->nome . '. Esta funcionalidade será implementada em breve.');
     }
 
     public function transferirParaCliente()
     {
         // Implementação futura para transferir para cliente
-        $this->dispatch('notify', type: 'info', message: 'Funcionalidade de transferir para cliente será implementada em breve.');
+        $this->dispatch('notify', type: 'info', message: 'Transferindo ' . $this->nome . ' para o cadastro de clientes. Esta funcionalidade será implementada em breve.');
     }
 
     public function transferirParaConsultor()
     {
         // Implementação futura para transferir para consultor
-        $this->dispatch('notify', type: 'info', message: 'Funcionalidade de transferir para consultor será implementada em breve.');
+        $this->dispatch('notify', type: 'info', message: 'Transferindo ' . $this->nome . ' para o cadastro de consultores. Esta funcionalidade será implementada em breve.');
     }
 
     public function render()
