@@ -1,5 +1,7 @@
 
 import './bootstrap';
+import './calendar';
+
 
 // Importar os plugins do Alpine
 // import Alpine from 'alpinejs'; // REMOVIDO - Livewire deve fornecer
