@@ -1,0 +1,33 @@
+/* Estilos para cabeçalhos de tabela fixos */
+.table-container {
+    max-height: 70vh; /* Altura máxima da tabela, ajuste conforme necessário */
+    overflow-y: auto;
+    position: relative;
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-container thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table-container thead th {
+    background-color: #f3f4f6; /* Cor de fundo do cabeçalho */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Sombra sutil para separar o cabeçalho */
+}
+
+/* Garantir que a tabela ocupe toda a largura disponível */
+.table-container table {
+    min-width: 100%;
+}
+
+/* Estilo para quando o usuário passa o mouse sobre uma linha */
+.table-container tbody tr:hover {
+    background-color: #f9fafb;
+}

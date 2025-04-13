@@ -19,7 +19,7 @@
     </div>
 
     <!-- Tabela de Vendas -->
-    <div class="overflow-x-auto bg-white rounded-lg shadow">
+    <div class="overflow-x-auto bg-white rounded-lg shadow table-container">
         <table class="min-w-full border-collapse border">
         <thead>
             <tr class="bg-gray-200">

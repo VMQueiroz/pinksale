@@ -70,7 +70,7 @@
     </div>
 
     {{-- Tabela de Abordagens --}}
-    <div class="bg-white overflow-x-auto shadow-xl sm:rounded-lg">
+    <div class="bg-white overflow-x-auto shadow-xl sm:rounded-lg table-container">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>

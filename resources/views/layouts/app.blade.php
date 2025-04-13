@@ -15,6 +15,9 @@
     @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <!-- Sticky Header CSS -->
+    <link href="{{ asset('css/sticky-header.css') }}" rel="stylesheet">
+
     <style>
         [x-cloak] { display: none !important; }
     </style>

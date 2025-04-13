@@ -40,7 +40,7 @@
     </div>
 
     {{-- Tabela --}}
-    <div class="overflow-x-auto bg-white rounded-lg shadow">
+    <div class="overflow-x-auto bg-white rounded-lg shadow table-container">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>

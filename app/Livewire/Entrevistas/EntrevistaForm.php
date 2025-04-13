@@ -167,8 +167,7 @@ class EntrevistaForm extends Component
 
                 // Atualizar a data de último contato da abordagem
                 $this->abordagem->update([
-                    'ultimo_contato' => now()->format('Y-m-d'),
-                    'data_retorno' => !empty($this->data_entrevista) ? $this->data_entrevista : null,
+                    'ultimo_contato' => now()->format('Y-m-d')
                 ]);
 
                 $message = 'Entrevista agendada com sucesso!';

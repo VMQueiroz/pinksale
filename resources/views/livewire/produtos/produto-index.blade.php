@@ -18,7 +18,7 @@
     {{-- Filtros e Controles --}}
     <div class="mb-4 flex space-x-4">
         <div class="flex-1">
-            <x-text-input 
+            <x-text-input
                 wire:model.live.debounce.300ms="search"
                 type="search"
                 placeholder="Buscar produtos..."
@@ -42,7 +42,7 @@
     </div>
 
     {{-- Tabela de Produtos --}}
-    <div class="overflow-x-auto bg-white rounded-lg shadow">
+    <div class="overflow-x-auto bg-white rounded-lg shadow table-container">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -102,7 +102,7 @@
                             <x-secondary-button wire:click="$dispatch('open-modal', 'editar-produto-{{ $produto->id }}')">
                                 Editar
                             </x-secondary-button>
-                            <x-danger-button 
+                            <x-danger-button
                                 wire:click="delete({{ $produto->id }})"
                                 wire:confirm="Tem certeza que deseja remover este produto?"
                             >
