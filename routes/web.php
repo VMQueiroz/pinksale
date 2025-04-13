@@ -48,4 +48,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::prefix('abordagens')->name('abordagens.')->group(function () {
         Route::get('/', AbordagemIndex::class)->name('index');
     });
+
+    // Teste de Entrevista
+    Route::get('/teste-entrevista', App\Livewire\Agenda\TesteEntrevista::class)->name('teste-entrevista');
 });

@@ -5,7 +5,7 @@
 </x-slot>
 
 <div>
-    
+
     <!-- Filtros -->
     <div class="mb-4 flex space-x-4">
         <select wire:model="statusFiltro" class="border rounded p-2">
@@ -19,7 +19,8 @@
     </div>
 
     <!-- Tabela de Vendas -->
-    <table class="min-w-full border-collapse border">
+    <div class="overflow-x-auto bg-white rounded-lg shadow">
+        <table class="min-w-full border-collapse border">
         <thead>
             <tr class="bg-gray-200">
                 <th class="border p-2">ID</th>
@@ -53,6 +54,7 @@
             @endforeach
         </tbody>
     </table>
+    </div>
 
     <div class="mt-4">
         {{ $vendas->links() }}

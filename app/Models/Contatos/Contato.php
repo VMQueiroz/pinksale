@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Vendas\Venda;
 use App\Models\Sessoes\Sessao;
 use App\Models\Urnas\Urna;
+use App\Models\Entrevistas\Entrevista;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -41,6 +42,9 @@ class Contato extends Model
         'indicado_por',   // Referência a quem indicou a abordagem
         'data_retorno',   // Data para retornar contato
         'ultimo_contato', // Data do último contato realizado
+        'convertido_de',  // Tipo original antes da conversão
+        'data_conversao', // Data em que o contato foi convertido
+        'origem_conversao', // Origem da conversão
     ];
 
     protected $casts = [
@@ -51,6 +55,7 @@ class Contato extends Model
         'data_inicio' => 'date',
         'data_retorno' => 'date',
         'ultimo_contato' => 'date',
+        'data_conversao' => 'date',
     ];
 
     // Relacionamento com o usuário (consultor) que cadastrou o contato
@@ -89,6 +94,12 @@ class Contato extends Model
         return $this->hasMany(Urna::class, 'parceiro_id');
     }
 
+    // Relacionamento com entrevistas onde este contato é a abordagem
+    public function entrevistas(): HasMany
+    {
+        return $this->hasMany(Entrevista::class, 'abordagem_id');
+    }
+
     // Métodos auxiliares para verificar papéis
     public function isCliente(): bool
     {
@@ -100,14 +111,25 @@ class Contato extends Model
         return in_array('consultor', $this->papeis ?? []);
     }
 
+    public function isAbordagem(): bool
+    {
+        return in_array('abordagem', $this->papeis ?? []);
+    }
+
     public function isParceiro(): bool
     {
         return in_array('parceiro', $this->papeis ?? []);
     }
 
-    public function isAbordagem(): bool
+    // Métodos para rastreamento de conversão
+    public function foiConvertido(): bool
     {
-        return in_array('abordagem', $this->papeis ?? []);
+        return !empty($this->convertido_de);
+    }
+
+    public function foiAbordagem(): bool
+    {
+        return $this->convertido_de === 'abordagem';
     }
 
     // Método para adicionar um papel

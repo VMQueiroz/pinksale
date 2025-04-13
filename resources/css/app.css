@@ -5,3 +5,21 @@
 [x-cloak] {
     display: none;
 }
+
+/* Estilos personalizados para tabelas */
+.overflow-x-auto {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+/* Garante que o conteúdo principal tenha rolagem independente */
+.main-content {
+    height: calc(100vh - 4rem); /* 4rem = altura do header (h-16) */
+    overflow-y: auto;
+}
+
+/* Garante que o sidebar tenha rolagem independente */
+.sidebar-content {
+    height: 100%;
+    overflow-y: auto;
+}

@@ -8,10 +8,20 @@
                     Abordagens
                 </h2>
             </x-slot>
-            <div class="mt-1 flex space-x-4 text-sm text-gray-600">
-                <span>Total: {{ $totalAbordagens }}</span>
-                <span>Inícios: {{ $totalInicios }}</span>
-                <span>Clientes: {{ $totalClientes }}</span>
+            <div class="mt-1 flex flex-wrap gap-4 text-sm">
+                <div class="bg-gray-100 px-3 py-1 rounded-full">
+                    <span class="font-medium">Abordagens:</span> {{ $totalAbordagens }}
+                </div>
+                <div class="bg-green-100 px-3 py-1 rounded-full">
+                    <span class="font-medium">Inícios:</span> {{ $totalInicios }}
+                </div>
+                <div class="bg-blue-100 px-3 py-1 rounded-full">
+                    <span class="font-medium">Clientes:</span> {{ $totalClientes }}
+                </div>
+                <div class="bg-purple-100 px-3 py-1 rounded-full">
+                    <span class="font-medium">Convertidos:</span> {{ $totalConvertidos }}
+                    <span class="text-xs">({{ $totalConvertidosConsultor }} consultores, {{ $totalConvertidosCliente }} clientes)</span>
+                </div>
             </div>
         </div>
         <div>
@@ -37,9 +47,16 @@
         </div>
         <div>
             <x-select wire:model.live="filtroTipo" class="block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm">
-                <option value="todos">Todos</option>
+                <option value="todos">Todos os tipos</option>
                 <option value="inicio">Inícios</option>
                 <option value="cliente">Clientes</option>
+            </x-select>
+        </div>
+        <div>
+            <x-select wire:model.live="filtroStatus" class="block w-full border-gray-300 focus:border-pk focus:ring-pk rounded-md shadow-sm">
+                <option value="ativos">Apenas ativos</option>
+                <option value="convertidos">Convertidos</option>
+                <option value="todos">Todos os status</option>
             </x-select>
         </div>
         <div>
@@ -53,7 +70,7 @@
     </div>
 
     {{-- Tabela de Abordagens --}}
-    <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+    <div class="bg-white overflow-x-auto shadow-xl sm:rounded-lg">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -96,9 +113,25 @@
                                 wire:click="edit({{ $abordagem->id }})"
                                 x-data=""
                                 x-on:click="$dispatch('open-modal', 'editar-abordagem')"
+                                class="mr-1"
                             >
                                 Editar
                             </x-secondary-button>
+
+                            @if($abordagem->tipo_abordagem === 'inicio')
+                                <x-secondary-button
+                                    wire:click="abrirModalEntrevista({{ $abordagem->id }})"
+                                    x-data=""
+                                    x-on:click="$dispatch('open-modal', 'modal-entrevista')"
+                                    class="mr-1 bg-blue-100 hover:bg-blue-200 text-blue-800 border-blue-300 flex items-center"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    Entrevista
+                                </x-secondary-button>
+                            @endif
+
                             <x-danger-button
                                 wire:click="delete({{ $abordagem->id }})"
                                 wire:confirm="Tem certeza que deseja excluir esta abordagem?"
@@ -143,6 +176,36 @@
                     :contato="$abordagemEmEdicao"
                     :key="'abordagem-form-'.$abordagemEmEdicao->id"
                 />
+            @endif
+        </div>
+    </x-modal>
+
+    <x-modal name="modal-entrevista" :show="false" max-width="2xl">
+        <div class="p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Agendar Entrevista
+            </h2>
+            @if($abordagemParaEntrevista)
+                <div class="mb-4 bg-blue-50 p-3 rounded-md">
+                    <p class="text-sm text-blue-800">
+                        Agendando entrevista para <strong>{{ $abordagemParaEntrevista->nome }}</strong>
+                    </p>
+                </div>
+                <livewire:agenda.entrevista-form
+                    :abordagem="$abordagemParaEntrevista"
+                    :key="'entrevista-form-'.$abordagemParaEntrevista->id"
+                />
+
+                <!-- Botão de teste para verificar se o componente está funcionando -->
+                <div class="mt-4 p-3 bg-gray-50 rounded-md">
+                    <p class="text-sm text-gray-700 mb-2">Se o formulário não estiver funcionando, use este botão para testar:</p>
+                    <a href="{{ route('teste-entrevista') }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition">
+                        Abrir Página de Teste de Entrevista
+                    </a>
+                </div>
             @endif
         </div>
     </x-modal>

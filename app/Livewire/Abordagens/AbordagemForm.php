@@ -144,8 +144,8 @@ class AbordagemForm extends Component
                 'observacoes' => $this->observacoes,
                 'tipo_abordagem' => $this->tipo_abordagem,
                 'indicado_por' => $this->indicado_por,
-                'data_retorno' => $this->data_retorno,
-                'ultimo_contato' => $this->ultimo_contato,
+                'data_retorno' => !empty($this->data_retorno) ? $this->data_retorno : null,
+                'ultimo_contato' => !empty($this->ultimo_contato) ? $this->ultimo_contato : null,
             ];
 
             if ($this->contato && $this->contato->exists) {
@@ -172,20 +172,103 @@ class AbordagemForm extends Component
 
     public function criarEntrevista()
     {
-        // Implementação futura para criar entrevista
-        $this->dispatch('notify', type: 'info', message: 'Agendando entrevista para ' . $this->nome . '. Esta funcionalidade será implementada em breve.');
+        if (!$this->contato || !$this->contato->exists) {
+            $this->dispatch('notify', type: 'error', message: 'Você precisa salvar a abordagem antes de agendar uma entrevista.');
+            return;
+        }
+
+        // Verificar se a abordagem é do tipo 'inicio'
+        if ($this->contato->tipo_abordagem !== 'inicio') {
+            $this->dispatch('notify', type: 'error', message: 'Apenas abordagens do tipo "Início" podem ter entrevistas agendadas.');
+            return;
+        }
+
+        // Fechar o modal de edição de abordagem
+        $this->dispatch('close-modal', modal: 'editar-abordagem');
+
+        // Emitir evento para o componente AbordagemIndex
+        $this->dispatch('abrir-modal-entrevista', $this->contato->id);
     }
 
     public function transferirParaCliente()
     {
-        // Implementação futura para transferir para cliente
-        $this->dispatch('notify', type: 'info', message: 'Transferindo ' . $this->nome . ' para o cadastro de clientes. Esta funcionalidade será implementada em breve.');
+        if (!$this->contato || !$this->contato->exists) {
+            $this->dispatch('notify', type: 'error', message: 'Você precisa salvar a abordagem antes de transferir para cliente.');
+            return;
+        }
+
+        try {
+            // Modificar os papéis do contato
+            $papeis = $this->contato->papeis ?? [];
+
+            // Remover o papel de abordagem
+            $papeis = array_filter($papeis, function($papel) {
+                return $papel !== 'abordagem';
+            });
+
+            // Adicionar o papel de cliente
+            if (!in_array('cliente', $papeis)) {
+                $papeis[] = 'cliente';
+            }
+
+            // Atualizar o contato
+            $this->contato->update([
+                'papeis' => array_values($papeis), // Reindexar o array
+                'ativo' => true,
+                'habilitado_fidelidade' => true,
+                'convertido_de' => 'abordagem',
+                'data_conversao' => now(),
+                'origem_conversao' => 'transferencia_direta',
+            ]);
+
+            $this->dispatch('notify', type: 'success', message: $this->nome . ' foi transferido(a) para o cadastro de clientes com sucesso!');
+            $this->dispatch('close-modal', modal: 'editar-abordagem');
+            $this->dispatch('abordagem-transferida');
+
+        } catch (\Exception $e) {
+            $this->dispatch('notify', type: 'error', message: 'Erro ao transferir para cliente: ' . $e->getMessage());
+        }
     }
 
     public function transferirParaConsultor()
     {
-        // Implementação futura para transferir para consultor
-        $this->dispatch('notify', type: 'info', message: 'Transferindo ' . $this->nome . ' para o cadastro de consultores. Esta funcionalidade será implementada em breve.');
+        if (!$this->contato || !$this->contato->exists) {
+            $this->dispatch('notify', type: 'error', message: 'Você precisa salvar a abordagem antes de transferir para consultor.');
+            return;
+        }
+
+        try {
+            // Modificar os papéis do contato
+            $papeis = $this->contato->papeis ?? [];
+
+            // Remover o papel de abordagem
+            $papeis = array_filter($papeis, function($papel) {
+                return $papel !== 'abordagem';
+            });
+
+            // Adicionar o papel de consultor
+            if (!in_array('consultor', $papeis)) {
+                $papeis[] = 'consultor';
+            }
+
+            // Atualizar o contato
+            $this->contato->update([
+                'papeis' => array_values($papeis), // Reindexar o array
+                'ativo' => true,
+                'iniciado_por_mim' => true,
+                'data_inicio' => now(),
+                'convertido_de' => 'abordagem',
+                'data_conversao' => now(),
+                'origem_conversao' => 'transferencia_direta',
+            ]);
+
+            $this->dispatch('notify', type: 'success', message: $this->nome . ' foi transferido(a) para o cadastro de consultores com sucesso!');
+            $this->dispatch('close-modal', modal: 'editar-abordagem');
+            $this->dispatch('abordagem-transferida');
+
+        } catch (\Exception $e) {
+            $this->dispatch('notify', type: 'error', message: 'Erro ao transferir para consultor: ' . $e->getMessage());
+        }
     }
 
     public function render()

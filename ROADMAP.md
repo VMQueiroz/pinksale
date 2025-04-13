@@ -171,58 +171,71 @@
 ## 4. Módulo de Abordagens
 
 ### 4.1 Cadastro de Abordagens
-- [ ] Formulário principal com:
-  - Nome completo (único)
-  - Sistema de indicação integrado:
-    - Busca unificada (Clientes, Consultores, Parceiros, Sessões, Urnas)
-    - Formatação específica por tipo de indicação
-  - Endereço com autopreenchimento via CEP
-  - Estados e cidades dinâmicos
-  - Observações (textarea)
-  - Tipo de abordagem (Início/Cliente)
-- [ ] Sistema de entrevistas para tipo "Início":
-  - Botão "Criar Entrevista"
-  - Agendamento automático
-  - Status pendente
-  - Título padronizado
-  - Descrição vinculada às observações
+- [x] Formulário principal com:
+  - [x] Nome completo (único)
+  - [x] Campo para indicação (texto simples)
+  - [ ] Sistema de indicação integrado:
+    - [ ] Busca unificada (Clientes, Consultores, Parceiros, Sessões, Urnas)
+    - [ ] Formatação específica por tipo de indicação
+  - [x] Endereço com autopreenchimento via CEP
+  - [x] Estados e cidades dinâmicos
+  - [x] Observações (textarea)
+  - [x] Tipo de abordagem (Início/Cliente)
+  - [x] Campos de data (Data de Retorno e Último Contato)
+- [x] Interface visual aprimorada:
+  - [x] Indicador visual do tipo de abordagem
+  - [x] Ícones para campos e botões
+  - [x] Separação clara entre ações de edição e ações especiais
+- [x] Sistema de entrevistas para tipo "Início":
+  - [x] Botão "Criar Entrevista" (estrutura visual)
+  - [x] Implementação da funcionalidade
+  - [x] Agendamento automático
+  - [x] Status pendente
+  - [x] Título padronizado
+  - [x] Descrição vinculada às observações
 - [ ] Modais de cadastro rápido:
-  - Cliente
-  - Consultor
-  - Parceiro
-  - Sessão
-  - Urna
+  - [ ] Cliente
+  - [ ] Consultor
+  - [ ] Parceiro
+  - [ ] Sessão
+  - [ ] Urna
 
 ### 4.2 Gestão de Abordagens
 #### Listagem Principal
+- [x] Listagem básica de abordagens
+- [x] Estatísticas (total, inícios, clientes)
+- [x] Filtros por tipo
+- [x] Sistema de busca
+- [x] Paginação
 - [ ] Sistema de destaque automático:
-  - Abordagens vencidas
-  - Vencimentos do dia
-  - Regras de priorização
+  - [ ] Abordagens vencidas
+  - [ ] Vencimentos do dia
+  - [ ] Regras de priorização
 - [ ] Filtros predefinidos por data
 - [ ] Título dinâmico conforme filtro
-- [ ] Ações rápidas:
-  - Agendar entrevista
-  - Visualizar
-  - Editar
-  - Excluir
-  - Transferir para Cliente/Consultores
+- [x] Ações rápidas:
+  - [x] Editar
+  - [x] Excluir
+  - [ ] Agendar entrevista
+  - [ ] Transferir para Cliente/Consultores
 - [ ] Edição rápida de campos:
-  - Data de retorno
-  - Último contato
+  - [ ] Data de retorno
+  - [ ] Último contato
 
 #### Transferências
-- [ ] Sistema de conversão:
-  - Abordagem tipo "Cliente" → Cliente
-  - Abordagem tipo "Início" → Consultor
-- [ ] Preservação de dados:
-  - Manutenção do campo "Indicado por"
-  - Histórico de conversão
+- [x] Sistema de conversão:
+  - [x] Botões de transferência (estrutura visual)
+  - [x] Implementação da funcionalidade
+  - [x] Abordagem tipo "Cliente" → Cliente
+  - [x] Abordagem tipo "Início" → Consultor
+- [x] Preservação de dados:
+  - [x] Manutenção do campo "Indicado por"
+  - [x] Histórico de conversão
 
 #### Edição e Visualização
-- [ ] Form de edição completo
-- [ ] Sistema de exclusão
-- [ ] Botões de transferência contextuais
+- [x] Form de edição completo
+- [x] Sistema de exclusão
+- [x] Botões de transferência contextuais
 - [ ] Preservação de relacionamentos
 
 ## 5. Módulo de Parceiros e Consultores
@@ -1139,20 +1152,21 @@
    - [ ] Dashboard básico
 
 3. Sistema de Abordagens
-   - [ ] Formulário principal
-   - [ ] Sistema de entrevistas
-   - [ ] Conversão para Cliente/Consultor
+   - [x] Formulário principal
+   - [x] Listagem e filtros
+   - [x] Sistema de entrevistas
+   - [x] Conversão para Cliente/Consultor
 
 ### Fase 2: MVP Visual
 1. Layout Base
-   - [ ] Header responsivo
-   - [ ] Sidebar funcional
-   - [ ] Navegação principal
+   - [x] Header responsivo
+   - [x] Sidebar funcional
+   - [x] Navegação principal
 
 2. Componentes Essenciais
-   - [ ] Cards de dados
-   - [ ] Tabelas responsivas
-   - [ ] Formulários básicos
+   - [x] Cards de dados
+   - [x] Tabelas responsivas
+   - [x] Formulários básicos
 
 ### Fase 3: Refinamento
 1. UI/UX Avançado

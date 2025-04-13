@@ -35,10 +35,10 @@
         }
     </script>
 </head>
-<body class="font-sans antialiased bg-gray-100">
+<body class="font-sans antialiased bg-gray-100 overflow-hidden">
 <x-banner />
 
-<div x-data="appLayout()" x-cloak class="flex min-h-screen">
+<div x-data="appLayout()" x-cloak class="flex h-screen overflow-hidden">
 
     <!-- Sidebar -->
     <aside
@@ -48,7 +48,7 @@
             'translate-x-0 shadow-lg': isMobileMenuOpen,
             '-translate-x-full': !isMobileMenuOpen
         }"
-        class="fixed inset-y-0 left-0 z-40 bg-white text-pk transition-all duration-300 transform md:relative md:translate-x-0 md:flex md:flex-col flex-shrink-0 border-r border-gray-200"
+        class="fixed inset-y-0 left-0 z-40 bg-white text-pk transition-all duration-300 transform md:relative md:translate-x-0 md:flex md:flex-col flex-shrink-0 border-r border-gray-200 sidebar-content"
         aria-label="Sidebar">
 
         <!-- Logo Area -->
@@ -156,9 +156,9 @@
          x-transition:leave-end="opacity-0"></div>
 
     <!-- Main Content Area -->
-    <div class="flex flex-col flex-1 transition-all duration-300 pt-16" class="md:ml-10">
+    <div class="flex flex-col flex-1 transition-all duration-300 h-screen overflow-hidden">
         <!-- Header -->
-        <header class="fixed top-0 left-0 right-0 z-50 h-16 bg-pk text-white shadow-md flex items-center justify-between px-4" :class="isCollapsed ? 'md:left-20' : 'md:left-64'">
+        <header class="sticky top-0 z-50 h-16 bg-pk text-white shadow-md flex items-center justify-between px-4">
             <div class="flex items-center">
                 <!-- Mobile Menu Toggle -->
                 <button @click="toggleSidebarMobile()" class="text-white focus:outline-none md:hidden mr-4">
@@ -190,7 +190,7 @@
         </header>
 
         <!-- Page Content -->
-        <main class="flex-1 p-6">
+        <main class="flex-1 p-6 main-content">
             {{ $slot }}
         </main>
     </div>
