@@ -7,6 +7,7 @@ use App\Livewire\Produtos\ProdutoIndex;
 use App\Livewire\Parceiros\ParceiroIndex;
 use App\Livewire\Dashboard\DashboardIndex;
 use App\Livewire\Consultores\ConsultorIndex;
+use App\Livewire\Abordagens\AbordagemIndex;
 
 // Rota pública
 Route::get('/', function () {
@@ -41,5 +42,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     // Vendas
     Route::prefix('vendas')->name('vendas.')->group(function () {
         Route::get('/', VendasIndex::class)->name('index');
+    });
+
+    // Abordagens
+    Route::prefix('abordagens')->name('abordagens.')->group(function () {
+        Route::get('/', AbordagemIndex::class)->name('index');
     });
 });

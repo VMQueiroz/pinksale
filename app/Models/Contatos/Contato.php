@@ -36,7 +36,11 @@ class Contato extends Model
         'papeis',
         'iniciado_por_mim',
         'nome_contato',
-        'data_inicio', // Adicionando o novo campo
+        'data_inicio',
+        'tipo_abordagem', // Campo para abordagens (cliente/inicio)
+        'indicado_por',   // Referência a quem indicou a abordagem
+        'data_retorno',   // Data para retornar contato
+        'ultimo_contato', // Data do último contato realizado
     ];
 
     protected $casts = [
@@ -44,7 +48,9 @@ class Contato extends Model
         'habilitado_fidelidade' => 'boolean',
         'ativo' => 'boolean',
         'iniciado_por_mim' => 'boolean',
-        'data_inicio' => 'date', // Adicionando o cast para data
+        'data_inicio' => 'date',
+        'data_retorno' => 'date',
+        'ultimo_contato' => 'date',
     ];
 
     // Relacionamento com o usuário (consultor) que cadastrou o contato

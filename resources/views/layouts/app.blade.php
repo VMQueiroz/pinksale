@@ -63,7 +63,7 @@
         <!-- Navigation -->
         <nav class="flex-1 space-y-1">
             {{-- Dashboard --}}
-            <a href="{{ route('dashboard') }}" 
+            <a href="{{ route('dashboard') }}"
                class="flex items-center p-2 rounded-md hover:bg-pk hover:text-white {{ request()->routeIs('dashboard') ? 'bg-pk text-white' : 'text-pk' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -74,10 +74,10 @@
             {{-- Clientes e Parceiros --}}
             <div x-data="{ open: false }" class="relative">
                 <!-- Botão do menu -->
-                <button @click="open = !open" 
+                <button @click="open = !open"
                         :class="{
                             'z-[60]': open && isCollapsed,
-                            'bg-pk text-white': {{ request()->routeIs(['clientes.*', 'parceiros.*', 'sessoes.*', 'urnas.*', 'consultores.*', 'aniversariantes.*']) ? 'true' : 'false' }}
+                            'bg-pk text-white': {{ request()->routeIs(['clientes.*', 'parceiros.*', 'sessoes.*', 'urnas.*', 'consultores.*', 'aniversariantes.*', 'abordagens.*']) ? 'true' : 'false' }}
                         }"
                         class="flex items-center w-full p-2 rounded-md hover:bg-pk hover:text-white relative text-pk">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -88,9 +88,9 @@
                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                 </button>
-                
+
                 <!-- Submenu -->
-                <div x-show="open" 
+                <div x-show="open"
                      x-transition:enter="transition ease-out duration-100"
                      x-transition:enter-start="transform opacity-0 scale-95"
                      x-transition:enter-end="transform opacity-100 scale-100"
@@ -102,7 +102,7 @@
                          'origin-top-right bg-white rounded-md shadow-lg'
                      ]">
                     <div class="py-1">
-                        <a href="#" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white {{ request()->routeIs('abordagens.*') ? 'bg-pk text-white' : 'text-pk' }}">Abordagens</a>
+                        <a href="{{ route('abordagens.index') }}" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white {{ request()->routeIs('abordagens.*') ? 'bg-pk text-white' : 'text-pk' }}">Abordagens</a>
                         <a href="{{ route('clientes.index') }}" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white {{ request()->routeIs('clientes.*') ? 'bg-pk text-white' : 'text-pk' }}">Clientes</a>
                         <a href="{{ route('parceiros.index') }}" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white {{ request()->routeIs('parceiros.*') ? 'bg-pk text-white' : 'text-pk' }}">Parceiros</a>
                         <a href="#" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white {{ request()->routeIs('sessoes.*') ? 'bg-pk text-white' : 'text-pk' }}">Sessões</a>
@@ -114,7 +114,7 @@
             </div>
 
             {{-- Produtos --}}
-            <a href="{{ route('produtos.index') }}" 
+            <a href="{{ route('produtos.index') }}"
                class="flex items-center p-2 rounded-md hover:bg-pk hover:text-white {{ request()->routeIs('produtos.*') ? 'bg-pk text-white' : 'text-pk' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -123,7 +123,7 @@
             </a>
 
             {{-- Vendas --}}
-            <a href="{{ route('vendas.index') }}" 
+            <a href="{{ route('vendas.index') }}"
                class="flex items-center p-2 rounded-md hover:bg-pk hover:text-white {{ request()->routeIs('vendas.*') ? 'bg-pk text-white' : 'text-pk' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
