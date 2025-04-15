@@ -130,12 +130,12 @@
     font-weight: bold;
     flex-shrink: 0;
     background-color: rgba(16, 185, 129, 0.25); /* Fundo verde claro */
-    border-radius: 50%;
-    padding: 2px;
-    width: 18px;
-    height: 18px;
-    box-shadow: 0 0 3px rgba(4, 120, 87, 0.5); /* Sombra sutil verde */
-    border: 1px solid rgba(4, 120, 87, 0.3); /* Borda sutil */
+    border-radius: 3px; /* Quadrado com pontas levemente arredondadas */
+    padding: 1px;
+    width: 16px;
+    height: 16px;
+    box-shadow: 0 0 2px rgba(4, 120, 87, 0.3); /* Sombra sutil verde */
+    border: none; /* Sem borda */
 }
 
 /* Posicionamento do ícone de check */
