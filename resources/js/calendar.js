@@ -73,7 +73,6 @@ document.addEventListener('alpine:init', () => {
                 selectable: true,
                 selectMirror: true,
                 dayMaxEvents: true,
-                weekNumbers: true,
                 navLinks: true,
                 businessHours: {
                     daysOfWeek: [1, 2, 3, 4, 5], // Segunda a sexta
@@ -90,7 +89,7 @@ document.addEventListener('alpine:init', () => {
                     method: 'GET',
                     extraParams: () => {
                         return {
-                            tipoEvento: this.$wire.tipoEvento,
+                            tipoEvento: this.$wire.tipoEventoSelected,
                             search: this.$wire.search
                         };
                     },
@@ -102,10 +101,14 @@ document.addEventListener('alpine:init', () => {
                 eventClick: (info) => {
                     const eventId = info.event.id;
                     this.$wire.verEvento(eventId);
+                    // Dispatch o evento para abrir o modal
+                    this.$dispatch('open-modal', 'ver-evento');
                 },
                 select: (info) => {
                     const startDate = info.startStr.split('T')[0];
                     this.$wire.prepararNovoEvento(startDate);
+                    // Dispatch o evento para abrir o modal
+                    this.$dispatch('open-modal', 'novo-evento');
                 },
                 eventContent: (arg) => {
                     const eventEl = document.createElement('div');

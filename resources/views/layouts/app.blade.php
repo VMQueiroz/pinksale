@@ -23,6 +23,8 @@
 
     <style>
         [x-cloak] { display: none !important; }
+
+        
     </style>
 
     <!-- Alpine Function -->

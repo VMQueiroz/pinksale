@@ -20,8 +20,8 @@
                 </div>
 
                 <div>
-                    <label for="tipoEvento" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Evento</label>
-                    <x-select wire:model.live="tipoEvento" id="tipoEvento" class="w-full">
+                    <label for="tipoEventoSelected" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Evento</label>
+                    <x-select wire:model.live="tipoEventoSelected" id="tipoEventoSelected" class="w-full">
                         <option value="">Todos os tipos</option>
                         @foreach($tiposEventos as $tipo)
                             <option value="{{ $tipo }}">{{ ucfirst($tipo) }}</option>
@@ -47,7 +47,7 @@
         <div class="flex space-x-2">
             <button
                 wire:click="alterarVisualizacao('calendar')"
-                class="view-button {{ $viewMode === 'calendar' ? 'active' : '' }}"
+                class="view-button {{ $viewMode === 'calendar' ? 'bg-pk text-white' : 'text-pk hover:bg-pk hover:text-white' }}"s
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -56,7 +56,7 @@
             </button>
             <button
                 wire:click="alterarVisualizacao('list')"
-                class="view-button {{ $viewMode === 'list' ? 'active' : '' }}"
+                class="view-button {{ $viewMode === 'list' ? 'bg-pk text-white' : 'text-pk hover:bg-pk hover:text-white' }}"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -66,12 +66,19 @@
         </div>
 
         <div>
-            <x-button wire:click="prepararNovoEvento" class="bg-pk hover:bg-pk-dark text-white">
+        
+            <x-primary-button
+                type="button"
+                wire:click="prepararNovoEvento"
+                x-data=""
+                x-on:click.prevent="$dispatch('open-modal', 'novo-evento')"
+                class="bg-pk hover:bg-pk-dark text-white"
+            >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
                 Novo Evento
-            </x-button>
+            </x-primary-button>
         </div>
     </div>
 
@@ -116,6 +123,8 @@
                                 @foreach($eventosData as $evento)
                                     <div
                                         wire:click="verEvento({{ $evento->id }})"
+                                        x-data=""
+                                        x-on:click="$dispatch('open-modal', 'ver-evento')"
                                         class="flex items-start p-3 rounded-lg border {{ $evento->status === 'realizado' ? 'bg-green-50 border-green-200' : ($evento->status === 'cancelado' ? 'bg-red-50 border-red-200' : 'bg-white border-gray-200') }} hover:bg-gray-50 cursor-pointer transition-colors"
                                     >
                                         <div class="flex-shrink-0 mr-3">
@@ -207,7 +216,7 @@
     @endif
 
     {{-- Modal de Detalhes do Evento --}}
-    <x-modal wire:model.live="showEventoModal">
+    <x-modal name="ver-evento" :show="false">
         <div class="p-6">
             <h2 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-pk" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -277,7 +286,12 @@
 
                     <div class="mt-6 flex justify-between">
                         <div>
-                            <x-secondary-button wire:click="fecharModal" class="mr-2">
+                            <x-secondary-button
+                                wire:click="fecharModal"
+                                x-data=""
+                                x-on:click="$dispatch('close-modal', {modal: 'ver-evento'})"
+                                class="mr-2"
+                            >
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
@@ -285,16 +299,38 @@
                             </x-secondary-button>
                         </div>
 
-                        <div>
+                        <div class="flex space-x-2">
+                            <x-secondary-button
+                                wire:click="editarEvento"
+                                x-data=""
+                                x-on:click="$dispatch('close-modal', {modal: 'ver-evento'}); $dispatch('open-modal', 'novo-evento');"
+                                class="bg-blue-100 hover:bg-blue-200 text-blue-800 border-blue-300"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Editar
+                            </x-secondary-button>
+
                             @if($status === 'pendente')
-                                <x-danger-button wire:click="marcarComoCancelado" class="mr-2">
+                                <x-danger-button
+                                    wire:click="marcarComoCancelado"
+                                    x-data=""
+                                    x-on:click="$dispatch('close-modal', {modal: 'ver-evento'});"
+                                    class="mr-2"
+                                >
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                     Cancelar Evento
                                 </x-danger-button>
 
-                                <x-button wire:click="marcarComoRealizado" class="bg-green-600 hover:bg-green-700 text-white">
+                                <x-button
+                                    wire:click="marcarComoRealizado"
+                                    x-data=""
+                                    x-on:click="$dispatch('close-modal', {modal: 'ver-evento'});"
+                                    class="bg-green-600 hover:bg-green-700 text-white"
+                                >
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
@@ -309,7 +345,7 @@
     </x-modal>
 
     {{-- Modal de Novo Evento --}}
-    <x-modal wire:model.live="showNovoEventoModal">
+    <x-modal name="novo-evento" :show="false">
         <div class="p-6">
             <h2 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-pk" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -363,13 +399,21 @@
                     </div>
 
                     <div class="mt-6 flex justify-end space-x-3">
-                        <x-secondary-button wire:click="fecharModal" type="button">
+                        <x-secondary-button
+                            wire:click="fecharModal"
+                            x-data=""
+                            x-on:click="$dispatch('close-modal', {modal: 'novo-evento'})"
+                            type="button"
+                        >
                             Cancelar
                         </x-secondary-button>
 
-                        <x-button type="submit" class="bg-pk hover:bg-pk-dark">
+                        <x-primary-button type="submit" class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
                             {{ $eventoId ? 'Atualizar' : 'Salvar' }}
-                        </x-button>
+                        </x-primary-button>
                     </div>
                 </div>
             </form>

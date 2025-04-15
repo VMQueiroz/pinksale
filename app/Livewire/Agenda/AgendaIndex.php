@@ -11,12 +11,10 @@ use Livewire\Component;
 class AgendaIndex extends Component
 {
     public $search = '';
-    public $tipoEvento = '';
+    public $tipoEventoSelected = '';
     public $dataInicio;
     public $dataFim;
     public $eventoSelecionado = null;
-    public $showEventoModal = false;
-    public $showNovoEventoModal = false;
     public $viewMode = 'calendar'; // 'calendar' ou 'list'
 
     // Propriedades para o modal de evento
@@ -30,6 +28,7 @@ class AgendaIndex extends Component
     public $status;
     public $contatoId;
     public $contato;
+    public $tipoEvento;
 
     public function mount()
     {
@@ -63,6 +62,7 @@ class AgendaIndex extends Component
         $this->local = $evento->local;
         $this->status = $evento->status;
         $this->contatoId = $evento->contato_id;
+        $this->tipoEvento = $evento->tipo_evento;
 
         if ($evento->contato_id) {
             $this->contato = Contato::find($evento->contato_id);
@@ -70,12 +70,19 @@ class AgendaIndex extends Component
             $this->contato = null;
         }
 
-        $this->showEventoModal = true;
+        $this->dispatch('open-modal', 'ver-evento');
+    }
+
+    public function editarEvento()
+    {
+        // Já temos os dados do evento carregados, apenas abrimos o modal de edição
+        $this->dispatch('close-modal', ['modal' => 'ver-evento']);
+        $this->dispatch('open-modal', 'novo-evento');
     }
 
     public function prepararNovoEvento($data = null)
     {
-        $this->resetExcept(['search', 'tipoEvento', 'dataInicio', 'dataFim', 'viewMode']);
+        $this->resetExcept(['search', 'tipoEventoSelected', 'dataInicio', 'dataFim', 'viewMode']);
 
         if ($data) {
             $this->dataEvento = $data;
@@ -87,7 +94,7 @@ class AgendaIndex extends Component
         $this->horaFim = '10:00';
         $this->status = 'pendente';
 
-        $this->showNovoEventoModal = true;
+        $this->dispatch('open-modal', 'novo-evento');
     }
 
     public function salvarEvento()
@@ -98,7 +105,7 @@ class AgendaIndex extends Component
             'horaInicio' => 'required',
             'tipoEvento' => 'required|string',
         ]);
-
+        
         $dados = [
             'user_id' => Auth::id(),
             'tipo_evento' => $this->tipoEvento,
@@ -120,24 +127,24 @@ class AgendaIndex extends Component
             $evento = Agenda::findOrFail($this->eventoId);
             $evento->update($dados);
             $message = 'Evento atualizado com sucesso!';
-            $this->dispatch('eventUpdated');
+
         } else {
             // Criar novo evento
             Agenda::create($dados);
             $message = 'Evento criado com sucesso!';
-            $this->dispatch('eventAdded');
         }
 
         $this->dispatch('notify', type: 'success', message: $message);
-        $this->fecharModal();
+        $this->dispatch('close-modal', modal: 'novo-evento');
+        $this->resetExcept(['search', 'tipoEventoSelected', 'dataInicio', 'dataFim', 'viewMode']);
         $this->dispatch('refreshCalendar');
     }
 
     public function fecharModal()
     {
-        $this->showEventoModal = false;
-        $this->showNovoEventoModal = false;
-        $this->resetExcept(['search', 'tipoEvento', 'dataInicio', 'dataFim', 'viewMode']);
+        $this->dispatch('close-modal', ['modal' => 'ver-evento']);
+        $this->dispatch('close-modal', ['modal' => 'novo-evento']);
+        $this->resetExcept(['search', 'tipoEventoSelected', 'dataInicio', 'dataFim', 'viewMode']);
     }
 
     public function marcarComoRealizado()
@@ -148,7 +155,8 @@ class AgendaIndex extends Component
         ]);
 
         $this->dispatch('notify', type: 'success', message: 'Evento marcado como realizado com sucesso!');
-        $this->fecharModal();
+        $this->dispatch('close-modal', ['modal' => 'ver-evento']);
+        $this->resetExcept(['search', 'tipoEventoSelected', 'dataInicio', 'dataFim', 'viewMode']);
         $this->dispatch('refreshCalendar');
     }
 
@@ -160,7 +168,8 @@ class AgendaIndex extends Component
         ]);
 
         $this->dispatch('notify', type: 'success', message: 'Evento marcado como cancelado com sucesso!');
-        $this->fecharModal();
+        $this->dispatch('close-modal', ['modal' => 'ver-evento']);
+        $this->resetExcept(['search', 'tipoEventoSelected', 'dataInicio', 'dataFim', 'viewMode']);
         $this->dispatch('refreshCalendar');
     }
 
@@ -186,8 +195,8 @@ class AgendaIndex extends Component
                         ->orWhere('local', 'like', '%' . $this->search . '%');
                 });
             })
-            ->when($this->tipoEvento, function ($query) {
-                $query->where('tipo_evento', $this->tipoEvento);
+            ->when($this->tipoEventoSelected, function ($query) {
+                $query->where('tipo_evento', $this->tipoEventoSelected);
             })
             ->with('contato')
             ->get()
@@ -262,8 +271,8 @@ class AgendaIndex extends Component
                         ->orWhere('local', 'like', '%' . $this->search . '%');
                 });
             })
-            ->when($this->tipoEvento, function ($query) {
-                $query->where('tipo_evento', $this->tipoEvento);
+            ->when($this->tipoEventoSelected, function ($query) {
+                $query->where('tipo_evento', $this->tipoEventoSelected);
             })
             ->when($this->dataInicio, function ($query) {
                 $query->whereDate('data_evento', '>=', $this->dataInicio);
