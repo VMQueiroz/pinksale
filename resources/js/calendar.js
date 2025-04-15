@@ -93,6 +93,17 @@ document.addEventListener('alpine:init', () => {
                             search: this.$wire.search
                         };
                     },
+                    success: function(events) {
+                        console.log('Eventos carregados com sucesso:', events);
+                        // Verificar as cores dos eventos
+                        if (events.length > 0) {
+                            console.log('Exemplo de evento:', events[0]);
+                            console.log('Cor de fundo:', events[0].backgroundColor);
+                            console.log('Cor da borda:', events[0].borderColor);
+                            console.log('Tipo de evento:', events[0].extendedProps.tipoEvento);
+                            console.log('Status:', events[0].extendedProps.status);
+                        }
+                    },
                     failure: function(error) {
                         console.error('Erro ao carregar eventos:', error);
                         alert('Erro ao carregar eventos! Verifique o console para mais detalhes.');
@@ -119,20 +130,44 @@ document.addEventListener('alpine:init', () => {
                     iconEl.classList.add('event-icon', 'mr-1');
 
                     if (arg.event.extendedProps.tipoEvento === 'entrevista') {
+                        // Ícone de pessoa para entrevista
                         iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>';
                     } else if (arg.event.extendedProps.tipoEvento === 'sessao') {
+                        // Ícone de grupo para sessão
                         iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>';
+                    } else if (arg.event.extendedProps.tipoEvento === 'urna') {
+                        // Ícone de caixa/urna
+                        iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>';
                     } else {
+                        // Ícone de calendário para outros tipos
                         iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>';
                     }
 
                     eventEl.appendChild(iconEl);
 
+                    // Criar um container para o título e o ícone de check
+                    const titleContainer = document.createElement('div');
+                    titleContainer.classList.add('event-title-container');
+                    titleContainer.style.display = 'flex';
+                    titleContainer.style.justifyContent = 'space-between';
+                    titleContainer.style.alignItems = 'center';
+                    titleContainer.style.width = '100%';
+
                     // Adicionar título
                     const titleEl = document.createElement('span');
                     titleEl.classList.add('event-title');
                     titleEl.innerText = arg.event.title;
-                    eventEl.appendChild(titleEl);
+                    titleContainer.appendChild(titleEl);
+
+                    // Adicionar ícone de check para eventos realizados
+                    if (arg.event.extendedProps.status === 'realizado') {
+                        const checkIcon = document.createElement('span');
+                        checkIcon.classList.add('event-check-icon');
+                        checkIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>';
+                        titleContainer.appendChild(checkIcon);
+                    }
+
+                    eventEl.appendChild(titleContainer);
 
                     // Adicionar hora se for visualização de dia ou semana
                     if (this.calendar.view.type !== 'dayGridMonth') {
@@ -153,24 +188,92 @@ document.addEventListener('alpine:init', () => {
 
                     return { domNodes: [eventEl] };
                 },
-                eventClassNames: (arg) => {
-                    const classNames = [];
+                // Função removida pois não está sendo usada
 
-                    // Adicionar classe com base no status
-                    if (arg.event.extendedProps.status === 'realizado') {
-                        classNames.push('event-completed');
-                    } else if (arg.event.extendedProps.status === 'cancelado') {
-                        classNames.push('event-cancelled');
+                // Garantir que as cores definidas na API sejam usadas
+                eventDidMount: function(info) {
+                    // Logs de depuração removidos
+
+                    // Verificar o status do evento
+                    const status = info.event.extendedProps.status;
+                    const isCancelled = status === 'cancelado';
+                    const isCompleted = status === 'realizado';
+
+                    // Adicionar atributo de data para facilitar a seleção via CSS
+                    info.el.setAttribute('data-fc-event-status', status);
+
+                    // Obter o tipo de evento para determinar a cor base
+                    const tipoEvento = info.event.extendedProps.tipoEvento;
+                    let corBase, corBorda;
+
+                    // Definir cores base por tipo
+                    switch(tipoEvento) {
+                        case 'entrevista':
+                            corBase = isCancelled || isCompleted ? 'rgba(59, 130, 246, 0.5)' : 'rgb(59, 130, 246)'; // Azul
+                            corBorda = isCancelled || isCompleted ? 'rgba(37, 99, 235, 0.7)' : 'rgb(37, 99, 235)'; // Azul escuro
+                            break;
+                        case 'sessao':
+                            corBase = isCancelled || isCompleted ? 'rgba(139, 92, 246, 0.5)' : 'rgb(139, 92, 246)'; // Roxo
+                            corBorda = isCancelled || isCompleted ? 'rgba(124, 58, 237, 0.7)' : 'rgb(124, 58, 237)'; // Roxo escuro
+                            break;
+                        case 'urna':
+                            corBase = isCancelled || isCompleted ? 'rgba(245, 158, 11, 0.5)' : 'rgb(245, 158, 11)'; // Laranja
+                            corBorda = isCancelled || isCompleted ? 'rgba(217, 119, 6, 0.7)' : 'rgb(217, 119, 6)'; // Laranja escuro
+                            break;
+                        case 'outro':
+                            corBase = isCancelled || isCompleted ? 'rgba(236, 72, 153, 0.5)' : 'rgb(236, 72, 153)'; // Rosa
+                            corBorda = isCancelled || isCompleted ? 'rgba(219, 39, 119, 0.7)' : 'rgb(219, 39, 119)'; // Rosa escuro
+                            break;
+                        default:
+                            corBase = isCancelled || isCompleted ? 'rgba(107, 114, 128, 0.5)' : 'rgb(107, 114, 128)'; // Cinza
+                            corBorda = isCancelled || isCompleted ? 'rgba(75, 85, 99, 0.7)' : 'rgb(75, 85, 99)'; // Cinza escuro
                     }
 
-                    // Adicionar classe com base no tipo
-                    if (arg.event.extendedProps.tipoEvento === 'entrevista') {
-                        classNames.push('event-interview');
-                    } else if (arg.event.extendedProps.tipoEvento === 'sessao') {
-                        classNames.push('event-session');
+                    if (isCancelled) {
+
+                        // Adicionar a classe para texto tachado
+                        info.el.classList.add('event-cancelled');
+
+                        // Forçar o texto tachado em todos os elementos filhos
+                        const titleElements = info.el.querySelectorAll('.fc-event-title, .fc-sticky, .fc-event-time');
+                        titleElements.forEach(el => {
+                            el.style.setProperty('text-decoration', 'line-through', 'important');
+                            el.style.setProperty('text-decoration-thickness', '2px', 'important');
+                        });
+
+                        // Se não encontrou elementos, aplicar ao próprio elemento do evento
+                        if (titleElements.length === 0) {
+                            info.el.style.setProperty('text-decoration', 'line-through', 'important');
+                            info.el.style.setProperty('text-decoration-thickness', '2px', 'important');
+                        }
+
+                        // Aplicar a cor base com opacidade diretamente no elemento
+                        info.el.style.setProperty('background-color', corBase, 'important');
+                        info.el.style.setProperty('border-color', corBorda, 'important');
+
+                        // Forçar a remoção de qualquer cor vermelha
+                        setTimeout(() => {
+                            info.el.style.setProperty('background-color', corBase, 'important');
+                            info.el.style.setProperty('border-color', corBorda, 'important');
+                        }, 10);
+                    } else if (isCompleted) {
+
+                        // Adicionar a classe para eventos realizados (apenas mais claros, sem tachado)
+                        info.el.classList.add('event-completed');
+
+                        // Aplicar a cor base com opacidade diretamente no elemento
+                        info.el.style.setProperty('background-color', corBase, 'important');
+                        info.el.style.setProperty('border-color', corBorda, 'important');
                     }
 
-                    return classNames;
+                    // Para eventos pendentes, aplicar as cores normais
+                    if (!isCancelled && !isCompleted) {
+                        // Aplicar a cor base diretamente no elemento
+                        info.el.style.setProperty('background-color', corBase, 'important');
+                        info.el.style.setProperty('border-color', corBorda, 'important');
+                    }
+
+                    // Logs de depuração removidos
                 }
             });
 

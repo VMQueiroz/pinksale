@@ -63,29 +63,91 @@
     font-weight: 400;
 }
 
-/* Estilos para eventos com base no status */
-.event-completed {
-    background-color: #10b981 !important;
-    border-color: #059669 !important;
-}
-
-.event-cancelled {
-    background-color: #ef4444 !important;
-    border-color: #dc2626 !important;
-    text-decoration: line-through;
+/* Estilos para eventos cancelados - aplicar a todos os elementos possíveis */
+.fc-event.event-cancelled,
+.fc-daygrid-event.event-cancelled,
+.fc-list-event.event-cancelled,
+.fc-timegrid-event.event-cancelled,
+[data-fc-event-status="cancelado"],
+.fc-event[data-fc-event-status="cancelado"],
+.fc-daygrid-event[data-fc-event-status="cancelado"],
+.fc-timegrid-event[data-fc-event-status="cancelado"],
+.fc-list-event[data-fc-event-status="cancelado"] {
+    text-decoration: line-through !important;
+    text-decoration-thickness: 2px !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
     opacity: 0.7;
 }
 
-/* Estilos para eventos com base no tipo */
-.event-interview {
-    background-color: #3b82f6 !important;
-    border-color: #2563eb !important;
+/* Garantir que o texto dentro do evento cancelado também esteja tachado */
+.event-cancelled .fc-event-title,
+.event-cancelled .fc-event-time,
+.event-cancelled .fc-event-main,
+.event-cancelled .fc-event-title-container,
+.event-cancelled .fc-sticky,
+.event-cancelled .fc-event-time,
+.event-cancelled .fc-event-title,
+.event-cancelled .fc-list-event-title,
+.event-cancelled .fc-event-main-frame,
+.event-cancelled .fc-daygrid-event-dot,
+.event-cancelled .fc-list-event-dot,
+.event-cancelled .fc-event-content-custom,
+.event-cancelled .event-icon,
+.event-cancelled span,
+.event-cancelled div,
+[data-fc-event-status="cancelado"] .fc-event-title,
+[data-fc-event-status="cancelado"] .fc-event-time,
+[data-fc-event-status="cancelado"] .fc-event-main,
+[data-fc-event-status="cancelado"] .fc-event-title-container,
+[data-fc-event-status="cancelado"] .fc-sticky,
+[data-fc-event-status="cancelado"] span,
+[data-fc-event-status="cancelado"] div {
+    text-decoration: line-through !important;
+    text-decoration-thickness: 2px !important;
+    opacity: 0.7;
 }
 
-.event-session {
-    background-color: #8b5cf6 !important;
-    border-color: #7c3aed !important;
+/* Aplicar diretamente aos elementos do FullCalendar */
+.fc .fc-daygrid-event[data-fc-event-status="cancelado"] .fc-event-title,
+.fc .fc-timegrid-event[data-fc-event-status="cancelado"] .fc-event-title {
+    text-decoration: line-through !important;
+    text-decoration-thickness: 2px !important;
 }
+
+/* Estilos para eventos realizados - mais claros e com ícone de check */
+.event-completed {
+    opacity: 0.7;
+}
+
+/* Estilo para o ícone de check em eventos realizados */
+.event-check-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 4px;
+    color: #10b981; /* Verde */
+    font-weight: bold;
+}
+
+/* Posicionamento do ícone de check */
+.fc-event-title-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.fc-list-event .event-check-icon {
+    margin-left: 8px;
+}
+
+/* Remover qualquer cor vermelha padrão do FullCalendar */
+.fc-event[data-fc-event-status="cancelado"] {
+    background-color: transparent !important;
+    border-color: transparent !important;
+}
+
+/* Não definimos cores aqui, pois queremos usar as cores do EventColorService */
 
 /* Estilos para o conteúdo personalizado dos eventos */
 .fc-event-content-custom {
@@ -143,11 +205,11 @@
         flex-direction: column;
         gap: 0.5rem;
     }
-    
+
     .fc .fc-toolbar-title {
         font-size: 1.2rem;
     }
-    
+
     .calendar-container {
         min-height: 500px;
         height: calc(100vh - 200px);

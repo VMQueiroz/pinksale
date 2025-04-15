@@ -4,6 +4,7 @@ namespace App\Livewire\Agenda;
 
 use App\Models\Agenda\Agenda;
 use App\Models\Contatos\Contato;
+use App\Services\EventColorService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -105,7 +106,7 @@ class AgendaIndex extends Component
             'horaInicio' => 'required',
             'tipoEvento' => 'required|string',
         ]);
-        
+
         $dados = [
             'user_id' => Auth::id(),
             'tipo_evento' => $this->tipoEvento,
@@ -147,27 +148,42 @@ class AgendaIndex extends Component
         $this->resetExcept(['search', 'tipoEventoSelected', 'dataInicio', 'dataFim', 'viewMode']);
     }
 
-    public function marcarComoRealizado()
-    {
-        $evento = Agenda::findOrFail($this->eventoId);
-        $evento->update([
-            'status' => 'realizado'
-        ]);
-
-        $this->dispatch('notify', type: 'success', message: 'Evento marcado como realizado com sucesso!');
-        $this->dispatch('close-modal', ['modal' => 'ver-evento']);
-        $this->resetExcept(['search', 'tipoEventoSelected', 'dataInicio', 'dataFim', 'viewMode']);
-        $this->dispatch('refreshCalendar');
-    }
+    // Método substituído pelo atualizarStatus
 
     public function marcarComoCancelado()
     {
+        $this->atualizarStatus('cancelado');
+    }
+
+    public function marcarComoRealizado()
+    {
+        $this->atualizarStatus('realizado');
+    }
+
+    public function atualizarStatus($novoStatus)
+    {
         $evento = Agenda::findOrFail($this->eventoId);
         $evento->update([
-            'status' => 'cancelado'
+            'status' => $novoStatus
         ]);
 
-        $this->dispatch('notify', type: 'success', message: 'Evento marcado como cancelado com sucesso!');
+        $mensagens = [
+            'pendente' => 'Evento marcado como pendente com sucesso!',
+            'realizado' => 'Evento marcado como realizado com sucesso!',
+            'cancelado' => 'Evento marcado como cancelado com sucesso!'
+        ];
+
+        $this->status = $novoStatus; // Atualiza o status no componente
+        $this->dispatch('notify', type: 'success', message: $mensagens[$novoStatus]);
+        $this->dispatch('refreshCalendar');
+    }
+
+    public function excluirEvento()
+    {
+        $evento = Agenda::findOrFail($this->eventoId);
+        $evento->delete();
+
+        $this->dispatch('notify', type: 'success', message: 'Evento excluído com sucesso!');
         $this->dispatch('close-modal', ['modal' => 'ver-evento']);
         $this->resetExcept(['search', 'tipoEventoSelected', 'dataInicio', 'dataFim', 'viewMode']);
         $this->dispatch('refreshCalendar');
@@ -213,52 +229,14 @@ class AgendaIndex extends Component
                     'status' => $evento->status,
                     'local' => $evento->local,
                     'contato' => $evento->contato ? $evento->contato->nome : null,
-                    'backgroundColor' => $this->getEventColor($evento->tipo_evento, $evento->status),
-                    'borderColor' => $this->getEventBorderColor($evento->tipo_evento, $evento->status),
+                    'backgroundColor' => EventColorService::getEventColor($evento->tipo_evento, $evento->status),
+                    'borderColor' => EventColorService::getEventBorderColor($evento->tipo_evento, $evento->status),
                     'textColor' => '#ffffff',
                 ];
             });
     }
 
-    private function getEventColor($tipo, $status)
-    {
-        if ($status === 'cancelado') {
-            return '#ef4444'; // Vermelho
-        }
-
-        if ($status === 'realizado') {
-            return '#10b981'; // Verde
-        }
-
-        switch ($tipo) {
-            case 'entrevista':
-                return '#3b82f6'; // Azul
-            case 'sessao':
-                return '#8b5cf6'; // Roxo
-            default:
-                return '#6b7280'; // Cinza
-        }
-    }
-
-    private function getEventBorderColor($tipo, $status)
-    {
-        if ($status === 'cancelado') {
-            return '#dc2626'; // Vermelho escuro
-        }
-
-        if ($status === 'realizado') {
-            return '#059669'; // Verde escuro
-        }
-
-        switch ($tipo) {
-            case 'entrevista':
-                return '#2563eb'; // Azul escuro
-            case 'sessao':
-                return '#7c3aed'; // Roxo escuro
-            default:
-                return '#4b5563'; // Cinza escuro
-        }
-    }
+    // Métodos de cores movidos para App\Services\EventColorService
 
     public function render()
     {

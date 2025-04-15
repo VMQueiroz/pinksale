@@ -66,7 +66,7 @@
         </div>
 
         <div>
-        
+
             <x-primary-button
                 type="button"
                 wire:click="prepararNovoEvento"
@@ -140,9 +140,15 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                                     </svg>
                                                 </div>
+                                            @elseif($evento->tipo_evento === 'urna')
+                                                <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                                    </svg>
+                                                </div>
                                             @else
-                                                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <div class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                     </svg>
                                                 </div>
@@ -218,30 +224,80 @@
     {{-- Modal de Detalhes do Evento --}}
     <x-modal name="ver-evento" :show="false">
         <div class="p-6">
-            <h2 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-pk" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                Detalhes do Evento
-            </h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-medium text-gray-900 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-pk" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Detalhes do Evento
+                </h2>
+
+                <button
+                    type="button"
+                    x-on:click="$dispatch('close-modal', {modal: 'ver-evento'})"
+                    class="text-gray-400 hover:text-gray-500 focus:outline-none"
+                >
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
 
             @if($eventoId)
                 <div class="space-y-4">
                     <div>
-                        <h3 class="text-xl font-semibold text-gray-800">{{ $titulo }}</h3>
-                        @if($status === 'pendente')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                Pendente
-                            </span>
-                        @elseif($status === 'realizado')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                Realizado
-                            </span>
-                        @elseif($status === 'cancelado')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                Cancelado
-                            </span>
-                        @endif
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ $titulo }}</h3>
+
+                        <!-- Cards de Status Interativos -->
+                        <div class="flex space-x-3 mt-3">
+                            <!-- Card Status: Pendente -->
+                            <button
+                                type="button"
+                                wire:click="{{ $status !== 'pendente' ? 'atualizarStatus(\''.'pendente'.'\')'  : '' }}"
+                                class="flex-1 py-2 px-3 rounded-lg border text-center transition-all duration-200 {{ $status === 'pendente'
+                                    ? 'bg-yellow-100 border-yellow-300 text-yellow-800 shadow-inner'
+                                    : 'bg-white border-gray-200 text-gray-600 hover:bg-yellow-50 hover:border-yellow-200 hover:text-yellow-700 shadow' }}"
+                            >
+                                <div class="flex justify-center items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span class="text-sm font-medium">Pendente</span>
+                                </div>
+                            </button>
+
+                            <!-- Card Status: Realizado -->
+                            <button
+                                type="button"
+                                wire:click="{{ $status !== 'realizado' ? 'marcarComoRealizado' : '' }}"
+                                class="flex-1 py-2 px-3 rounded-lg border text-center transition-all duration-200 {{ $status === 'realizado'
+                                    ? 'bg-green-100 border-green-300 text-green-800 shadow-inner'
+                                    : 'bg-white border-gray-200 text-gray-600 hover:bg-green-50 hover:border-green-200 hover:text-green-700 shadow' }}"
+                            >
+                                <div class="flex justify-center items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span class="text-sm font-medium">Realizado</span>
+                                </div>
+                            </button>
+
+                            <!-- Card Status: Cancelado -->
+                            <button
+                                type="button"
+                                wire:click="{{ $status !== 'cancelado' ? 'marcarComoCancelado' : '' }}"
+                                class="flex-1 py-2 px-3 rounded-lg border text-center transition-all duration-200 {{ $status === 'cancelado'
+                                    ? 'bg-red-100 border-red-300 text-red-800 shadow-inner'
+                                    : 'bg-white border-gray-200 text-gray-600 hover:bg-red-50 hover:border-red-200 hover:text-red-700 shadow' }}"
+                            >
+                                <div class="flex justify-center items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    <span class="text-sm font-medium">Cancelado</span>
+                                </div>
+                            </button>
+                        </div>
                     </div>
 
                     @if($descricao)
@@ -252,6 +308,41 @@
                     @endif
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-700">Tipo de Evento</h4>
+                            <p class="mt-1 text-sm text-gray-600">
+                                @if($tipoEvento === 'entrevista')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        Entrevista
+                                    </span>
+                                @elseif($tipoEvento === 'sessao')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                        Sessão
+                                    </span>
+                                @elseif($tipoEvento === 'urna')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                        </svg>
+                                        Urna
+                                    </span>
+                                @elseif($tipoEvento === 'outro')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        Outro
+                                    </span>
+                                @endif
+                            </p>
+                        </div>
+
                         <div>
                             <h4 class="text-sm font-medium text-gray-700">Data</h4>
                             <p class="mt-1 text-sm text-gray-600">
@@ -284,59 +375,32 @@
                         @endif
                     </div>
 
-                    <div class="mt-6 flex justify-between">
-                        <div>
-                            <x-secondary-button
-                                wire:click="fecharModal"
-                                x-data=""
-                                x-on:click="$dispatch('close-modal', {modal: 'ver-evento'})"
-                                class="mr-2"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                                Fechar
-                            </x-secondary-button>
-                        </div>
-
-                        <div class="flex space-x-2">
-                            <x-secondary-button
+                    <div class="mt-6">
+                        <div class="flex flex-wrap justify-end gap-3">
+                            <!-- Botão de Editar - Sempre visível -->
+                            <x-primary-button
                                 wire:click="editarEvento"
                                 x-data=""
                                 x-on:click="$dispatch('close-modal', {modal: 'ver-evento'}); $dispatch('open-modal', 'novo-evento');"
-                                class="bg-blue-100 hover:bg-blue-200 text-blue-800 border-blue-300"
+                                class="bg-blue-600 hover:bg-blue-700 text-white"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
                                 Editar
-                            </x-secondary-button>
+                            </x-primary-button>
 
-                            @if($status === 'pendente')
-                                <x-danger-button
-                                    wire:click="marcarComoCancelado"
-                                    x-data=""
-                                    x-on:click="$dispatch('close-modal', {modal: 'ver-evento'});"
-                                    class="mr-2"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                    Cancelar Evento
-                                </x-danger-button>
-
-                                <x-button
-                                    wire:click="marcarComoRealizado"
-                                    x-data=""
-                                    x-on:click="$dispatch('close-modal', {modal: 'ver-evento'});"
-                                    class="bg-green-600 hover:bg-green-700 text-white"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Marcar como Realizado
-                                </x-button>
-                            @endif
+                            <!-- Botão de Excluir - Sempre visível -->
+                            <x-danger-button
+                                x-data=""
+                                x-on:click="if (confirm('Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.')) { $wire.excluirEvento(); $dispatch('close-modal', {modal: 'ver-evento'}); }"
+                                class="bg-red-600 hover:bg-red-700"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Excluir
+                            </x-danger-button>
                         </div>
                     </div>
                 </div>
@@ -347,12 +411,24 @@
     {{-- Modal de Novo Evento --}}
     <x-modal name="novo-evento" :show="false">
         <div class="p-6">
-            <h2 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-pk" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                {{ $eventoId ? 'Editar Evento' : 'Novo Evento' }}
-            </h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-medium text-gray-900 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-pk" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    {{ $eventoId ? 'Editar Evento' : 'Novo Evento' }}
+                </h2>
+
+                <button
+                    type="button"
+                    x-on:click="$dispatch('close-modal', {modal: 'novo-evento'})"
+                    class="text-gray-400 hover:text-gray-500 focus:outline-none"
+                >
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
 
             <form wire:submit.prevent="salvarEvento">
                 <div class="space-y-4">
@@ -367,6 +443,7 @@
                             <option value="">Selecione um tipo</option>
                             <option value="entrevista">Entrevista</option>
                             <option value="sessao">Sessão</option>
+                            <option value="urna">Urna</option>
                             <option value="outro">Outro</option>
                         </x-select>
                     </div>
@@ -395,6 +472,15 @@
                         <div>
                             <label for="local" class="block text-sm font-medium text-gray-700">Local</label>
                             <x-input wire:model="local" id="local" type="text" class="mt-1 block w-full" />
+                        </div>
+
+                        <div>
+                            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                            <x-select wire:model="status" id="status" class="mt-1 block w-full" required>
+                                <option value="pendente">Pendente</option>
+                                <option value="realizado">Realizado</option>
+                                <option value="cancelado">Cancelado</option>
+                            </x-select>
                         </div>
                     </div>
 
