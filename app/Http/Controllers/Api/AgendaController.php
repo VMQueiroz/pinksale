@@ -59,9 +59,62 @@ class AgendaController extends Controller
                 'backgroundColor' => EventColorService::getEventColor($evento->tipo_evento, $evento->status),
                 'borderColor' => EventColorService::getEventBorderColor($evento->tipo_evento, $evento->status),
                 'textColor' => '#ffffff',
+                'editable' => true, // Permitir arrastar e soltar
             ];
         });
 
         return response()->json($eventos);
+    }
+
+    /**
+     * Atualiza um evento quando arrastado ou redimensionado no calendário
+     */
+    public function atualizarEvento(Request $request)
+    {
+        $user = Auth::user();
+        $eventoId = $request->input('id');
+        $novaData = $request->input('start');
+        $novoFim = $request->input('end');
+
+        // Verificar se o evento pertence ao usuário atual
+        $evento = Agenda::where('id', $eventoId)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$evento) {
+            return response()->json(['error' => 'Evento não encontrado'], 404);
+        }
+
+        try {
+            // Extrair data e hora
+            $dataHoraInicio = Carbon::parse($novaData);
+            $dataEvento = $dataHoraInicio->format('Y-m-d');
+            $horaInicio = $dataHoraInicio->format('H:i:s');
+
+            $horaFim = null;
+            if ($novoFim) {
+                $dataHoraFim = Carbon::parse($novoFim);
+                $horaFim = $dataHoraFim->format('H:i:s');
+            }
+
+            // Atualizar o evento
+            $evento->update([
+                'data_evento' => $dataEvento,
+                'hora_inicio' => $horaInicio,
+                'hora_fim' => $horaFim,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Evento atualizado com sucesso!',
+                'evento' => $evento
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao atualizar evento: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -290,6 +290,114 @@ document.addEventListener('alpine:init', () => {
                     }
 
                     // Logs de depuração removidos
+                },
+
+                // Manipulador para quando um evento é arrastado e solto
+                eventDrop: function(info) {
+                    const evento = info.event;
+                    const id = evento.id;
+                    const start = evento.start;
+                    const end = evento.end;
+
+                    // Confirmar a ação com o usuário
+                    if (!confirm('Tem certeza que deseja mover este evento?')) {
+                        info.revert(); // Reverter a ação se o usuário cancelar
+                        return;
+                    }
+
+                    // Enviar a atualização para o servidor
+                    fetch('/agenda/api/eventos/atualizar', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            id: id,
+                            start: start ? start.toISOString() : null,
+                            end: end ? end.toISOString() : null
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Notificar o usuário do sucesso
+                            Livewire.dispatch('notify', {
+                                type: 'success',
+                                message: 'Evento atualizado com sucesso!'
+                            });
+                        } else {
+                            // Reverter a ação e mostrar erro
+                            info.revert();
+                            Livewire.dispatch('notify', {
+                                type: 'error',
+                                message: data.message || 'Erro ao atualizar evento.'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        // Reverter a ação e mostrar erro
+                        info.revert();
+                        console.error('Erro ao atualizar evento:', error);
+                        Livewire.dispatch('notify', {
+                            type: 'error',
+                            message: 'Erro ao atualizar evento. Tente novamente.'
+                        });
+                    });
+                },
+
+                // Manipulador para quando um evento é redimensionado
+                eventResize: function(info) {
+                    const evento = info.event;
+                    const id = evento.id;
+                    const start = evento.start;
+                    const end = evento.end;
+
+                    // Confirmar a ação com o usuário
+                    if (!confirm('Tem certeza que deseja redimensionar este evento?')) {
+                        info.revert(); // Reverter a ação se o usuário cancelar
+                        return;
+                    }
+
+                    // Enviar a atualização para o servidor
+                    fetch('/agenda/api/eventos/atualizar', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            id: id,
+                            start: start ? start.toISOString() : null,
+                            end: end ? end.toISOString() : null
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Notificar o usuário do sucesso
+                            Livewire.dispatch('notify', {
+                                type: 'success',
+                                message: 'Evento atualizado com sucesso!'
+                            });
+                        } else {
+                            // Reverter a ação e mostrar erro
+                            info.revert();
+                            Livewire.dispatch('notify', {
+                                type: 'error',
+                                message: data.message || 'Erro ao atualizar evento.'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        // Reverter a ação e mostrar erro
+                        info.revert();
+                        console.error('Erro ao atualizar evento:', error);
+                        Livewire.dispatch('notify', {
+                            type: 'error',
+                            message: 'Erro ao atualizar evento. Tente novamente.'
+                        });
+                    });
                 }
             });
 

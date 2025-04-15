@@ -58,6 +58,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::prefix('agenda')->name('agenda.')->group(function () {
         Route::get('/', AgendaIndex::class)->name('index');
         Route::get('/api/eventos', [AgendaController::class, 'getEventos'])->name('api.eventos');
+        Route::post('/api/eventos/atualizar', [AgendaController::class, 'atualizarEvento'])->name('api.eventos.atualizar');
     });
 
     // As funções auxiliares para cores dos eventos foram movidas para App\Services\EventColorService
