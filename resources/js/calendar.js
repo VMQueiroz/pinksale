@@ -125,9 +125,25 @@ document.addEventListener('alpine:init', () => {
                     const eventEl = document.createElement('div');
                     eventEl.classList.add('fc-event-content-custom');
 
+                    // Criar um container para o ícone, título e o ícone de check (todos na mesma linha)
+                    const titleContainer = document.createElement('div');
+                    titleContainer.classList.add('event-title-container');
+                    titleContainer.style.display = 'flex';
+                    titleContainer.style.justifyContent = 'space-between';
+                    titleContainer.style.alignItems = 'center';
+                    titleContainer.style.width = '100%';
+
+                    // Criar um container para o ícone e o título (lado esquerdo)
+                    const leftContainer = document.createElement('div');
+                    leftContainer.style.display = 'flex';
+                    leftContainer.style.alignItems = 'center';
+                    leftContainer.style.flexGrow = '1';
+                    leftContainer.style.overflow = 'hidden';
+
                     // Adicionar ícone com base no tipo de evento
                     const iconEl = document.createElement('span');
                     iconEl.classList.add('event-icon', 'mr-1');
+                    iconEl.style.flexShrink = '0';
 
                     if (arg.event.extendedProps.tipoEvento === 'entrevista') {
                         // Ícone de pessoa para entrevista
@@ -143,27 +159,27 @@ document.addEventListener('alpine:init', () => {
                         iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>';
                     }
 
-                    eventEl.appendChild(iconEl);
-
-                    // Criar um container para o título e o ícone de check
-                    const titleContainer = document.createElement('div');
-                    titleContainer.classList.add('event-title-container');
-                    titleContainer.style.display = 'flex';
-                    titleContainer.style.justifyContent = 'space-between';
-                    titleContainer.style.alignItems = 'center';
-                    titleContainer.style.width = '100%';
+                    leftContainer.appendChild(iconEl);
 
                     // Adicionar título
                     const titleEl = document.createElement('span');
                     titleEl.classList.add('event-title');
                     titleEl.innerText = arg.event.title;
-                    titleContainer.appendChild(titleEl);
+                    titleEl.style.overflow = 'hidden';
+                    titleEl.style.textOverflow = 'ellipsis';
+                    titleEl.style.whiteSpace = 'nowrap';
+                    leftContainer.appendChild(titleEl);
 
-                    // Adicionar ícone de check para eventos realizados
+                    // Adicionar o container esquerdo ao container principal
+                    titleContainer.appendChild(leftContainer);
+
+                    // Adicionar ícone de check para eventos realizados (lado direito)
                     if (arg.event.extendedProps.status === 'realizado') {
                         const checkIcon = document.createElement('span');
                         checkIcon.classList.add('event-check-icon');
-                        checkIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>';
+                        checkIcon.style.flexShrink = '0';
+                        checkIcon.style.marginLeft = '4px';
+                        checkIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>';
                         titleContainer.appendChild(checkIcon);
                     }
 
@@ -209,24 +225,24 @@ document.addEventListener('alpine:init', () => {
                     // Definir cores base por tipo
                     switch(tipoEvento) {
                         case 'entrevista':
-                            corBase = isCancelled || isCompleted ? 'rgba(59, 130, 246, 0.5)' : 'rgb(59, 130, 246)'; // Azul
-                            corBorda = isCancelled || isCompleted ? 'rgba(37, 99, 235, 0.7)' : 'rgb(37, 99, 235)'; // Azul escuro
+                            corBase = isCancelled || isCompleted ? 'rgba(59, 130, 246, 0.7)' : 'rgb(59, 130, 246)'; // Azul
+                            corBorda = isCancelled || isCompleted ? 'rgba(37, 99, 235, 0.8)' : 'rgb(37, 99, 235)'; // Azul escuro
                             break;
                         case 'sessao':
-                            corBase = isCancelled || isCompleted ? 'rgba(139, 92, 246, 0.5)' : 'rgb(139, 92, 246)'; // Roxo
-                            corBorda = isCancelled || isCompleted ? 'rgba(124, 58, 237, 0.7)' : 'rgb(124, 58, 237)'; // Roxo escuro
+                            corBase = isCancelled || isCompleted ? 'rgba(139, 92, 246, 0.7)' : 'rgb(139, 92, 246)'; // Roxo
+                            corBorda = isCancelled || isCompleted ? 'rgba(124, 58, 237, 0.8)' : 'rgb(124, 58, 237)'; // Roxo escuro
                             break;
                         case 'urna':
-                            corBase = isCancelled || isCompleted ? 'rgba(245, 158, 11, 0.5)' : 'rgb(245, 158, 11)'; // Laranja
-                            corBorda = isCancelled || isCompleted ? 'rgba(217, 119, 6, 0.7)' : 'rgb(217, 119, 6)'; // Laranja escuro
+                            corBase = isCancelled || isCompleted ? 'rgba(245, 158, 11, 0.7)' : 'rgb(245, 158, 11)'; // Laranja
+                            corBorda = isCancelled || isCompleted ? 'rgba(217, 119, 6, 0.8)' : 'rgb(217, 119, 6)'; // Laranja escuro
                             break;
                         case 'outro':
-                            corBase = isCancelled || isCompleted ? 'rgba(236, 72, 153, 0.5)' : 'rgb(236, 72, 153)'; // Rosa
-                            corBorda = isCancelled || isCompleted ? 'rgba(219, 39, 119, 0.7)' : 'rgb(219, 39, 119)'; // Rosa escuro
+                            corBase = isCancelled || isCompleted ? 'rgba(236, 72, 153, 0.7)' : 'rgb(236, 72, 153)'; // Rosa
+                            corBorda = isCancelled || isCompleted ? 'rgba(219, 39, 119, 0.8)' : 'rgb(219, 39, 119)'; // Rosa escuro
                             break;
                         default:
-                            corBase = isCancelled || isCompleted ? 'rgba(107, 114, 128, 0.5)' : 'rgb(107, 114, 128)'; // Cinza
-                            corBorda = isCancelled || isCompleted ? 'rgba(75, 85, 99, 0.7)' : 'rgb(75, 85, 99)'; // Cinza escuro
+                            corBase = isCancelled || isCompleted ? 'rgba(107, 114, 128, 0.7)' : 'rgb(107, 114, 128)'; // Cinza
+                            corBorda = isCancelled || isCompleted ? 'rgba(75, 85, 99, 0.8)' : 'rgb(75, 85, 99)'; // Cinza escuro
                     }
 
                     if (isCancelled) {

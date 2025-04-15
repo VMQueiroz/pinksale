@@ -77,7 +77,7 @@
     text-decoration-thickness: 2px !important;
     background-color: transparent !important;
     border-color: transparent !important;
-    opacity: 0.7;
+    opacity: 0.85; /* Aumentado para ficar mais visível */
 }
 
 /* Garantir que o texto dentro do evento cancelado também esteja tachado */
@@ -105,7 +105,7 @@
 [data-fc-event-status="cancelado"] div {
     text-decoration: line-through !important;
     text-decoration-thickness: 2px !important;
-    opacity: 0.7;
+    opacity: 0.85; /* Aumentado para ficar mais visível */
 }
 
 /* Aplicar diretamente aos elementos do FullCalendar */
@@ -117,7 +117,7 @@
 
 /* Estilos para eventos realizados - mais claros e com ícone de check */
 .event-completed {
-    opacity: 0.7;
+    opacity: 0.85; /* Mesma opacidade dos eventos cancelados */
 }
 
 /* Estilo para o ícone de check em eventos realizados */
@@ -125,9 +125,17 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-left: 4px;
-    color: #10b981; /* Verde */
+    margin-left: 6px;
+    color: #047857; /* Verde escuro */
     font-weight: bold;
+    flex-shrink: 0;
+    background-color: rgba(16, 185, 129, 0.25); /* Fundo verde claro */
+    border-radius: 50%;
+    padding: 2px;
+    width: 18px;
+    height: 18px;
+    box-shadow: 0 0 3px rgba(4, 120, 87, 0.5); /* Sombra sutil verde */
+    border: 1px solid rgba(4, 120, 87, 0.3); /* Borda sutil */
 }
 
 /* Posicionamento do ícone de check */
@@ -135,6 +143,29 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
+}
+
+/* Estilo para o container esquerdo (icone + titulo) */
+.event-title-container > div {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    min-width: 0; /* Importante para permitir que o texto seja truncado */
+    overflow: hidden;
+}
+
+/* Estilo para o título do evento */
+.event-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Estilo para o ícone do evento */
+.event-icon {
+    flex-shrink: 0;
+    margin-right: 4px;
 }
 
 .fc-list-event .event-check-icon {
