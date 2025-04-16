@@ -24,7 +24,7 @@ $maxWidth = [
         $el.querySelector('[x-show]')?.removeAttribute('style');
         $dispatch('close-modal', { modal: id });
     }"
-    class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50"
+    class="fixed mt-16 inset-0 overflow-y-auto px-0 py-6 sm:px-0 z-50 md:pl-8"
     style="display: none;"
 >
     <div 
