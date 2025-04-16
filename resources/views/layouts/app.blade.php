@@ -24,7 +24,50 @@
     <style>
         [x-cloak] { display: none !important; }
 
-        
+        /* Estilos para o submenu */
+        .sidebar-content.w-20 ~ div .submenu-outside {
+            position: fixed !important;
+            left: 80px !important;
+            z-index: 9999 !important;
+            width: 200px !important;
+        }
+
+        /* Garantir que o submenu seja exibido corretamente quando a sidebar está colapsada */
+        @media (min-width: 768px) {
+            .sidebar-content.w-20 + div #clientes-parceiros-submenu,
+            .sidebar-content.w-20 #clientes-parceiros-submenu {
+                position: fixed !important;
+                left: 80px !important;
+                z-index: 99999 !important;
+            }
+
+            /* Estilo para o submenu quando a sidebar está expandida */
+            .sidebar-content:not(.w-20) #clientes-parceiros-submenu {
+                width: 100% !important;
+                position: relative !important;
+                margin-top: 0.25rem !important;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+                left: 0 !important;
+                right: 0 !important;
+            }
+
+            /* Garantir que os links do submenu ocupem toda a largura disponível */
+            .sidebar-content:not(.w-20) #clientes-parceiros-submenu a {
+                width: 100% !important;
+                display: block !important;
+            }
+        }
+
+        /* Garantir que o submenu fique na frente do conteúdo principal */
+        #clientes-parceiros-submenu {
+            z-index: 99999 !important;
+        }
+
+        /* Ajustar o conteúdo principal para ficar atrás do submenu */
+        .main-content {
+            z-index: 1;
+            position: relative;
+        }
     </style>
 
     <!-- Alpine Function -->
@@ -33,11 +76,46 @@
             return {
                 isCollapsed: window.innerWidth < 768 ? true : false,
                 isMobileMenuOpen: false,
+                subMenuOpen: null, // Rastrear qual submenu está aberto
+                init() {
+                    // Verificar se estamos em uma rota que pertence a um submenu
+                    const isInClientesParceirosPaths = {{ request()->routeIs(['clientes.*', 'parceiros.*', 'sessoes.*', 'urnas.*', 'consultores.*', 'aniversariantes.*', 'abordagens.*']) ? 'true' : 'false' }};
+
+                    // Se estamos em uma rota de submenu e a sidebar está colapsada, abrir o submenu automaticamente
+                    if (isInClientesParceirosPaths && this.isCollapsed) {
+                        this.subMenuOpen = 'clientes-parceiros';
+                    }
+
+                    // Adicionar listener para redimensionamento da janela
+                    window.addEventListener('resize', () => {
+                        if (window.innerWidth < 768) {
+                            this.isCollapsed = true;
+                        }
+                    });
+                },
                 toggleSidebarDesktop() {
+                    // Guardar o estado atual do submenu
+                    const currentSubmenuState = this.subMenuOpen;
+
+                    // Alternar o estado da sidebar
                     this.isCollapsed = !this.isCollapsed;
+
+                    // Fechar o submenu quando a sidebar é colapsada ou expandida
+                    this.subMenuOpen = null;
                 },
                 toggleSidebarMobile() {
                     this.isMobileMenuOpen = !this.isMobileMenuOpen;
+                },
+                toggleSubmenu(name) {
+                    // Se clicar no mesmo submenu, alterna entre aberto/fechado
+                    if (this.subMenuOpen === name) {
+                        this.subMenuOpen = null;
+                    } else {
+                        this.subMenuOpen = name;
+                    }
+                },
+                isSubmenuOpen(name) {
+                    return this.subMenuOpen === name;
                 }
             }
         }
@@ -46,7 +124,7 @@
 <body class="font-sans antialiased bg-gray-100 overflow-hidden">
 <x-banner />
 
-<div x-data="appLayout()" x-cloak class="flex h-screen overflow-hidden">
+<div x-data="appLayout()" x-init="init()" @click.away="subMenuOpen = null" x-cloak class="flex h-screen overflow-hidden">
 
     <!-- Sidebar -->
     <aside
@@ -80,36 +158,40 @@
             </a>
 
             {{-- Clientes e Parceiros --}}
-            <div x-data="{ open: false }" class="relative">
+            <div class="relative w-full">
                 <!-- Botão do menu -->
-                <button @click="open = !open"
+                <button id="clientes-parceiros-btn" x-ref="clientesBtn" @click="toggleSubmenu('clientes-parceiros'); $event.stopPropagation();"
+                        class="flex items-center w-full p-2 rounded-md hover:bg-pk hover:text-white relative text-pk"
                         :class="{
-                            'z-[60]': open && isCollapsed,
                             'bg-pk text-white': {{ request()->routeIs(['clientes.*', 'parceiros.*', 'sessoes.*', 'urnas.*', 'consultores.*', 'aniversariantes.*', 'abordagens.*']) ? 'true' : 'false' }}
-                        }"
-                        class="flex items-center w-full p-2 rounded-md hover:bg-pk hover:text-white relative text-pk">
+                        }">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                     <span x-show="!isCollapsed" class="ml-3">Clientes e Parceiros</span>
-                    <svg x-show="!isCollapsed" class="w-3 h-3 ml-auto" :class="{'rotate-180': open}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <svg x-show="!isCollapsed" class="w-3 h-3 ml-auto" :class="{'rotate-180': isSubmenuOpen('clientes-parceiros')}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                 </button>
 
                 <!-- Submenu -->
-                <div x-show="open"
+                <div id="clientes-parceiros-submenu"
+                     x-show="isSubmenuOpen('clientes-parceiros')"
                      x-transition:enter="transition ease-out duration-100"
                      x-transition:enter-start="transform opacity-0 scale-95"
                      x-transition:enter-end="transform opacity-100 scale-100"
                      x-transition:leave="transition ease-in duration-75"
                      x-transition:leave-start="transform opacity-100 scale-100"
                      x-transition:leave-end="transform opacity-0 scale-95"
-                     :class="[
-                         isCollapsed ? 'absolute left-full top-0 ml-1 w-48 z-[55]' : 'relative w-full mt-1',
-                         'origin-top-right bg-white rounded-md shadow-lg'
-                     ]">
-                    <div class="py-1">
+                     x-cloak
+                     class="bg-white rounded-md shadow-lg py-1 overflow-hidden border border-gray-200"
+                     :class="isCollapsed ? 'fixed left-20 top-0 w-48 z-[99999]' : 'relative w-full mt-1'"
+                     :style="isCollapsed ? 'top: ' + $refs.clientesBtn.getBoundingClientRect().top + 'px;' : ''"
+                     @click.away="subMenuOpen = null">
+
+                    <!-- Adicionar uma seta para o submenu quando colapsado -->
+                    <div x-show="isCollapsed" class="absolute top-3 -left-2 w-0 h-0 border-t-[6px] border-t-transparent border-r-[6px] border-r-white border-b-[6px] border-b-transparent"></div>
+                    <div class="py-1 w-full" :class="{ 'px-0': !isCollapsed, 'px-1': isCollapsed }">
                         <a href="{{ route('abordagens.index') }}" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white {{ request()->routeIs('abordagens.*') ? 'bg-pk text-white' : 'text-pk' }}">Abordagens</a>
                         <a href="{{ route('clientes.index') }}" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white {{ request()->routeIs('clientes.*') ? 'bg-pk text-white' : 'text-pk' }}">Clientes</a>
                         <a href="{{ route('parceiros.index') }}" class="block px-4 py-2 text-sm text-pk hover:bg-pk hover:text-white {{ request()->routeIs('parceiros.*') ? 'bg-pk text-white' : 'text-pk' }}">Parceiros</a>
@@ -185,7 +267,7 @@
                 </button>
 
                 <!-- Desktop Sidebar Toggle -->
-                <button @click="toggleSidebarDesktop()" class="hidden md:block text-white focus:outline-none">
+                <button @click="toggleSidebarDesktop(); subMenuOpen = null;" class="hidden md:block text-white focus:outline-none">
                     {{-- Replaced arrows with hamburger icon --}}
                     <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -216,6 +298,126 @@
 
 @stack('modals')
 @livewireScripts
+
+<!-- Script para garantir que o submenu seja exibido corretamente -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Verificar se estamos em uma rota que pertence ao submenu Clientes e Parceiros
+        const isInClientesParceirosPaths = {{ request()->routeIs(['clientes.*', 'parceiros.*', 'sessoes.*', 'urnas.*', 'consultores.*', 'aniversariantes.*', 'abordagens.*']) ? 'true' : 'false' }};
+
+        // Verificar se a sidebar está colapsada
+        const sidebarIsCollapsed = window.innerWidth < 768 || document.querySelector('.sidebar-content').classList.contains('w-20');
+
+        // Função para garantir que o submenu fique na frente
+        function ensureSubmenuOnTop() {
+            const submenu = document.getElementById('clientes-parceiros-submenu');
+            const sidebar = document.querySelector('.sidebar-content');
+            const isCollapsed = sidebar && sidebar.classList.contains('w-20');
+
+            if (submenu) {
+                if (isCollapsed) {
+                    // Quando a sidebar está colapsada, mover o submenu para o final do body
+                    document.body.appendChild(submenu);
+                    submenu.style.zIndex = '99999';
+                    submenu.style.position = 'fixed';
+
+                    // Posicionar o submenu corretamente
+                    const submenuButton = document.getElementById('clientes-parceiros-btn');
+                    if (submenuButton) {
+                        const buttonRect = submenuButton.getBoundingClientRect();
+                        submenu.style.left = '80px';
+                        submenu.style.top = buttonRect.top + 'px';
+                        submenu.style.width = '200px';
+                    }
+                } else {
+                    // Quando a sidebar está expandida, garantir que o submenu esteja dentro da sidebar
+                    const submenuParent = document.querySelector('.relative.w-full');
+                    if (submenuParent && !submenuParent.contains(submenu)) {
+                        submenuParent.appendChild(submenu);
+                    }
+
+                    // Resetar os estilos inline
+                    submenu.style.position = 'relative';
+                    submenu.style.left = '0';
+                    submenu.style.top = '0';
+                    submenu.style.width = '100%';
+                    submenu.style.zIndex = '1';
+                    submenu.style.marginTop = '0.25rem';
+                }
+            }
+        }
+
+        // Se estamos em uma rota de submenu e a sidebar está colapsada, abrir o submenu automaticamente
+        if (isInClientesParceirosPaths && sidebarIsCollapsed) {
+            // Encontrar o botão do submenu pelo ID
+            const submenuButton = document.getElementById('clientes-parceiros-btn');
+
+            // Simular um clique no botão para abrir o submenu
+            if (submenuButton) {
+                setTimeout(() => {
+                    submenuButton.click();
+                    // Garantir que o submenu fique na frente
+                    setTimeout(ensureSubmenuOnTop, 100);
+                }, 500);
+            }
+        }
+
+        // Adicionar listener para cliques no botão do submenu
+        const submenuButton = document.getElementById('clientes-parceiros-btn');
+        if (submenuButton) {
+            submenuButton.addEventListener('click', function() {
+                // Garantir que o submenu fique na frente
+                setTimeout(ensureSubmenuOnTop, 100);
+            });
+        }
+
+        // Adicionar listener para o evento de alternar a sidebar
+        const sidebarToggleButtons = document.querySelectorAll('button.hidden.md\\:block');
+        sidebarToggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Verificar se o submenu está aberto
+                const submenu = document.getElementById('clientes-parceiros-submenu');
+                if (submenu && submenu.style.display !== 'none') {
+                    // Aguardar a transição da sidebar e reposicionar o submenu
+                    setTimeout(ensureSubmenuOnTop, 300);
+                }
+            });
+        });
+
+        // Adicionar listener para o botão de colapsar a sidebar
+        const sidebarToggleButton = document.querySelector('button.hidden.md\\:block');
+        if (sidebarToggleButton) {
+            sidebarToggleButton.addEventListener('click', function() {
+                // Fechar o submenu quando a sidebar é colapsada ou expandida
+                const submenu = document.getElementById('clientes-parceiros-submenu');
+                if (submenu) {
+                    submenu.style.display = 'none';
+                }
+            });
+        }
+
+        // Adicionar listener para cliques no documento para fechar o submenu
+        document.addEventListener('click', function(event) {
+            const submenu = document.getElementById('clientes-parceiros-submenu');
+            const submenuButton = document.getElementById('clientes-parceiros-btn');
+
+            // Se o clique não foi no submenu nem no botão do submenu, fechar o submenu
+            if (submenu && submenuButton &&
+                !submenu.contains(event.target) &&
+                !submenuButton.contains(event.target)) {
+
+                // Fechar o submenu usando Alpine.js
+                const appElement = document.querySelector('[x-data]');
+                if (appElement && appElement.__x) {
+                    appElement.__x.$data.subMenuOpen = null;
+                }
+
+                // Também esconder o submenu diretamente via DOM
+                submenu.style.display = 'none';
+            }
+        });
+    });
+</script>
 </body>
 </html>
 
